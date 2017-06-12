@@ -1,0 +1,3 @@
+#!/bin/bash
+python3 TimeTest.py
+echo "Done!"

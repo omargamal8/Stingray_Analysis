@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "Bash Version: ${BASH_VERSION}"
+
+
+starting_pow=4
+final_pow=8
+echo '(Bash) Starting tests from %starting_pow upto $final_pow'
+echo 
+
+for ((i=starting_pow; i<=final_pow; i++)); do
+echo "Testing with 10^$i.."
+echo "(Bash) Starting time test"
+python3 TestScript.py 1 $i 12
+python3 -m cProfile -o ./TimeProfiles/tenpw$i.prof TestScript.py 1 $i
+echo "(Bash) Starting memory test"
+mprof run TestScript.py 1 $i
+echo
+done
+echo "(Bash) Done!"
