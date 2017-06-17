@@ -38,15 +38,25 @@ counts = np.random.rand(lc_size)*100
 #Lightcurve initialization
 t0 = time.time()
 
-lc1 = Lightcurve(times, counts, validate_dt = True)
+lc1 = Lightcurve(times, counts, validate_dt = False)
 
 t1 = time.time()
 
+print(t1 - t0)
+
 if(len(test_options)>3):
-	f = open("./TimeProfiles/Values.txt", "a")
-	strtobewritten = "ten pw " + str(power) + ": " + str(t1-t0)+"\n"
-	f.write(strtobewritten)
-	f.close()
+	print("arguments")
+	if(test_options[3] == 'plotting'):
+		print("Dakhal")
+		f = open("./TimeProfiles/plotting_values.txt", "a")
+		strtobewritten = str(base) + " * ten pw " + str(power) + ": " + str(t1-t0)+"\n"
+		f.write(strtobewritten)
+		f.close()
+	else:	
+		f = open("./TimeProfiles/Values.txt", "a")
+		strtobewritten = "ten pw " + str(power) + ": " + str(t1-t0)+"\n"
+		f.write(strtobewritten)
+		f.close()
 # print("Lightcurve initialization took:", t1-t0)
 
 # time.sleep(4)

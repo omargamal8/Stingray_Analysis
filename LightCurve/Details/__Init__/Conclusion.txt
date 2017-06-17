@@ -1,0 +1,3 @@
+The memory usuage reaches its peak when the numpy allclose gets called.
+I am suspecting that the implementation of allclose creates more arrays of the same size as the input, which is in our case 780MB.
+So if there is a problem we could look for something else.
