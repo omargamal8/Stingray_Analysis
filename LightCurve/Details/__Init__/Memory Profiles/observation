@@ -1,0 +1,1 @@
+When np.allclose() gets called. the memory usage spikes up. This can be due to a creation of arrays inside the implementation of allclose.
