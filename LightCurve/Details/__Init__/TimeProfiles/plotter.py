@@ -30,8 +30,10 @@ key_gen = test_value_gen()
 for line in lines:
    if line == "\n":
    	continue
-   values[next(key_gen)] = float((line.split(':')[1])[1:-1])
+   values[next(key_gen)/10 ** 3] = float((line.split(':')[1]))
 
 valkeys = dictToLists(values)
-plt.plot(valkeys[0],valkeys[1],'r--')
+plt.plot(valkeys[0],valkeys[1])
+plt.xlabel("bins  1:1000")
+plt.ylabel("seconds")
 plt.show()
