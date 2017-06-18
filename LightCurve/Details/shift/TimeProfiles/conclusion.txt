@@ -1,0 +1,1 @@
+time results are exacatly like the __init__ results. This is expected because shift creates new lightcurve with the shifted values.

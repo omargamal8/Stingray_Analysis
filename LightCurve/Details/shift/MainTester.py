@@ -7,7 +7,7 @@ def printdict(dict):
 		print(key, dict[key])
 
 def writeResults(dict):
-	output_path = "./TimeProfiles/plotting_values2.txt"
+	output_path = "./TimeProfiles/plotting_values.txt"
 	output_file = open(output_path, "a")
 	for key in dict.keys():
 		strToBeWritten = str(key) + ":" + str(dict[key])
@@ -30,7 +30,7 @@ power = initial_power
 attempts = 5
 times = OrderedDict()
 
-print("Starting Tests")
+print("Starting Shift Tests")
 while(power <= final_power):
 	if(power == final_power):
 		final_base = upper_base+1

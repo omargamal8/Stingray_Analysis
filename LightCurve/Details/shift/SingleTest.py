@@ -19,9 +19,11 @@ def singleTest(base,power):
 	final_element = dt * lc_size
 	times = np.arange(0,final_element,dt)
 	counts = np.random.rand(lc_size) * 100
+	lc1 = Lightcurve(times,counts)
+
 
 	t0 = time.time()
-	lc1 = Lightcurve(times,counts)
+	lc1 = lc1.shift(1.1)
 	t1 = time.time()
 	
 	return t1-t0
@@ -50,16 +52,19 @@ if __name__ == '__main__':
 
 
 	#Lightcurve initialization
+	lc1 = Lightcurve(times, counts)	
+	print("LightCurve Created")
+	# time.sleep(5)
 	t0 = time.time()
 
-	lc1 = Lightcurve(times, counts)
+	lc1 = lc1.shift(1.1)
 
 	t1 = time.time()
 
 	print(t1 - t0)
 
 	if(len(test_options)>3):
-			f = open("./TimeProfiles/Snaps_values.txt", "a")
+			f = open("./TimeProfiles/Snaps_Results.txt", "a")
 			strtobewritten = "ten pw " + str(power) + ": " + str(t1-t0)+"\n"
 			f.write(strtobewritten)
 			f.close()
