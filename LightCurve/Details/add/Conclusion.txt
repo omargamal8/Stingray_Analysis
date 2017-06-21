@@ -1,0 +1,3 @@
+Looking at the time plot and understanding the logic, Shift depends entirely on the constructor of the light curve. It's time is dependant on creating a new lightcurve. The results are the same time results of the __init__ analysis.
+
+The memory usage reaches its peak after creating the new lightcurve. Because after we created the new light curve, at that point we are holding two lightcurves, the new and old one. 
