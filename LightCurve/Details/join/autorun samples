@@ -1,0 +1,30 @@
+#!/bin/bash
+echo "Bash Version: ${BASH_VERSION}"
+
+
+starting_pow=4
+final_pow=5
+final_base=2
+echo '(Bash) Starting tests from $starting_pow upto $final_pow'
+echo 
+
+for ((i=starting_pow; i<=final_pow; i++)); do
+
+echo "(Bash) Starting time test"
+if((i == final_pow))
+then
+echo "(Bash) final itr"
+python3 -m cProfile -o ./TimeProfiles/tenpw$i.prof SingleTest.py 1 $i
+mprof run SingleTest.py 1 $i
+echo "final_base"
+python3 -m cProfile -o ./TimeProfiles/2tenpw$i.prof SingleTest.py $final_base $i
+mprof run SingleTest.py $final_base $i
+else
+echo "(Bash) Testing with 10^$i.."
+python3 -m cProfile -o ./TimeProfiles/tenpw$i.prof SingleTest.py 1 $i
+echo "(Bash) Starting memory test"
+mprof run SingleTest.py 1 $i
+echo
+fi
+done
+echo "(Bash) Done!"
