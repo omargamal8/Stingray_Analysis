@@ -7,14 +7,14 @@ def test_leahy_correct_for_multiple():
         n = 100
         lc_all = []
         t1 = btime.time()
-        gcounts = np.random.poisson(1000, size=100000)
-
+        gcounts = np.random.poisson(1000, size=10000000)
+        t2 = btime.time()
         for i in range(n):
             time = np.arange(0.0, 10.0, 10./100000)
-            counts = gcounts[:]
+            counts = gcounts[i*100000:i*100000 + 100000]
             lc = Lightcurve(time, counts)
             lc_all.append(lc)
-        t2 = btime.time()
+        # t2 = btime.time()
 
         ps = AveragedPowerspectrum(lc_all, 10.0, norm="leahy")
 
@@ -26,4 +26,8 @@ def test_leahy_correct_for_multiple():
 # counts = np.random.rand(len(times))*100
 # lc1 = Lightcurve(times,counts)
 # pc = 
+t0 = btime.time()
 test_leahy_correct_for_multiple()
+t1 = btime.time()
+
+print(t1-t0)

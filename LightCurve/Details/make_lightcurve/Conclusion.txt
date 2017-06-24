@@ -1,0 +1,1 @@
+My conclusion is that make_light_curve has the time complexity of O(N^2)  (n squared). Which is caused by the numpy function histogram.
