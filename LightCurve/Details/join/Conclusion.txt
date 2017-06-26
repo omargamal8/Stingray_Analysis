@@ -1,0 +1,1 @@
+The Join function make a brute force search in a two lightcurves, this can be optimized using the fact that the lightcurve times are sorted.
