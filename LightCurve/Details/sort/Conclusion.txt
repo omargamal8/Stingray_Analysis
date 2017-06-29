@@ -1,0 +1,1 @@
+The time is consumed right after when the sorting occurs. After we sort the counts, we then go for an N^2 search to find the approperiate time for each new count.
