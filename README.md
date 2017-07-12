@@ -1,4 +1,4 @@
-This is a repo made specifically to create performance test script to analyze the library Stingray.
+This is a repo made specifically to create performance test scripts to analyze the Stingray library.
 How this repo is structured is as follow:
 For each module in Stingray there will be a folder in this repo that contain all its testing scripts.
 In the folder you can find subfolders for each method contained in the module.
