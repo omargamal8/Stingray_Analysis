@@ -1,2 +1,0 @@
-The complexity is linear which is good but the the values themselves are very high. 
-Testing with size 2*10^7 yielded 117 seconds. Which is a lot. The problem isn't in the algorithm it is in the raw python for loop written in stingray.util.rebin_data. 
