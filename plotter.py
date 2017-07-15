@@ -46,6 +46,35 @@ def plotAndSaveFromRaw(path):
 		output_dir+=dir+"/"		
 	plt.savefig(output_dir+"timefig.png")
 
+def nextColor():
+	colors = ['b','m','y','k','r','g','b--','m--','y--','k--', 'r--','g--']
+	for color in colors:
+		yield color
+def plotGroup(topDir):
+	# print("top dir:",topDir)
+	# return
+	from RunAllTests import findSingleTest
+	colors = nextColor()
+	paths = findSingleTest(topDir, keyword="plotting_values.txt")
+	legend = []
+	laf=0
+	for path in paths:
+		laf+=1
+		print(laf)
+		values = readValues(path+'/plotting_values.txt')
+		valkeys = dictToLists(values)
+		plt.plot(valkeys[0], valkeys[1], next(colors))
+		subdirs = path.split('/')
+		label = ""
+		for i, subdir in enumerate(subdirs):
+			if(i > subdirs.index(topDir.split('/')[-2]) and subdir != path.split('/')[-2]):
+				label+= subdir+" "
+		legend.append(label)
+	plt.xlabel("bins 1:1000")
+	plt.ylabel("seconds")
+	plt.legend(legend)
+	plt.show()
+
 if __name__ == "__main__":
 	arguments = sys.argv
 	if(len(arguments)>1):

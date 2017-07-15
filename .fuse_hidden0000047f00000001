@@ -12,7 +12,7 @@ def findSingleTest(dir,depth=0, keyword = "SingleTest.py"):
 			return None
 		subdirs = [subdir for subdir in os.listdir(dir) if os.path.isdir(dir+subdir)]
 		for subdir in subdirs:
-			returned_paths = findSingleTest(dir+subdir+"/", depth+1, keyword)
+			returned_paths = findSingleTest(dir+subdir+"/", depth+1)
 			if returned_paths != None:
 				paths = paths + (returned_paths)
 		return paths		
@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	current_dir = os.getcwd()
 	# current_dir +='/Lightcurve'
 	modules = [dir for dir in os.listdir(current_dir) if os.path.isdir(current_dir+'/'+dir) if not dir == ".git" if not dir == "__pycache__"]
-	modules = [modules[-1]]
+	modules = [modules[1]]
 	print(modules)
 	# print(modules)
 
