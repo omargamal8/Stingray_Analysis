@@ -44,9 +44,10 @@ if __name__ == '__main__':
 	else:
 		base = int(input("Base:"))
 		power = int(input("Power:"))
-
-	result = singleTest(base, power)
-
+	try:
+		result = singleTest(base, power)
+	except Exception as e:
+		print("7assal", str(e))
 	# print("Lightcurve initialization took:", t1-t0)
 
 	# time.sleep(4)

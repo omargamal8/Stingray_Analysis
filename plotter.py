@@ -38,6 +38,8 @@ def plotAndSaveFromRaw(path):
 	valkeys = dictToLists(values)
 	plt.clf()
 	plt.plot(valkeys[0], valkeys[1],'b')
+	plt.xlabel("bins  1:1000")
+	plt.ylabel("seconds")
 	input_dirs = path.split('/')[:-1]
 	output_dir = ""
 	for dir in input_dirs:

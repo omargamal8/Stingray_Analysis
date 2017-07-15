@@ -20,9 +20,10 @@ def findSingleTest(dir,depth=0):
 current_dir = os.getcwd()
 # current_dir +='/Lightcurve'
 modules = [dir for dir in os.listdir(current_dir) if os.path.isdir(current_dir+'/'+dir) if not dir == ".git" if not dir == "__pycache__"]
+modules = [modules[1]]
 print(modules)
-# modules = modules[4:]
 # print(modules)
+
 for module in modules:
 		print("Module",module)
 		module_fullpath = current_dir + '/' + module + '/'
@@ -32,9 +33,11 @@ for module in modules:
 			continue
 		else:
 			print(SingleTests)
-# 			for SingleTest in SingleTests:
+			for SingleTest in SingleTests:
 
-# 				print("Testing "+ module)
-# 				Tester = ContinuousTester(4,8,1)
-# 				Tester.testAndWrite(SingleTest)
-# 				plotter.plotAndSaveFromRaw(module+"/TimeProfiles/plotting_values.txt")
+				print("Testing "+ SingleTest)
+				Tester = ContinuousTester(4,6,9)
+				# Tester.runTests(SingleTest)
+				# Tester.testAndWrite(SingleTest)
+				plotter.plotAndSaveFromRaw(SingleTest+"/TimeProfiles/plotting_values.txt")
+

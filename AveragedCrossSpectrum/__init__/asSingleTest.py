@@ -1,4 +1,4 @@
-from stingray import Lightcurve, Crossspectrum
+from stingray import Lightcurve, AveragedCrossspectrum
 import numpy as np
 import time
 import sys
@@ -14,7 +14,7 @@ def calculate_size(number):
 
 
 def singleTest(base,power):
-	print("--CrossSpectrum: rebin SingleTest--")
+	print("--AveragedCrossSpec: __init__ SingleTest--")
 	dt = 0.03125
 	lc_size = base * (10 ** power)
 	final_element = dt * lc_size
@@ -28,10 +28,8 @@ def singleTest(base,power):
 	lc1 = Lightcurve(times1, counts1)
 	lc2 = Lightcurve(times2, counts2)
 
-	cs = Crossspectrum(lc1,lc2)
-
 	t0 = time.time()
-	cs.rebin(1.1)
+	av_cs = AveragedCrossspectrum(lc1,lc2)
 	t1 = time.time()
 	print(t1 - t0)
 	return t1-t0

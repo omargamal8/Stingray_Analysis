@@ -14,7 +14,7 @@ def calculate_size(number):
 
 
 def singleTest(base,power):
-	print("--CrossSpectrum: rebin SingleTest--")
+	print("--CrossSpectrum: Time Lag SingleTest--")
 	dt = 0.03125
 	lc_size = base * (10 ** power)
 	final_element = dt * lc_size
@@ -31,7 +31,7 @@ def singleTest(base,power):
 	cs = Crossspectrum(lc1,lc2)
 
 	t0 = time.time()
-	cs.rebin(1.1)
+	cs.time_lag()
 	t1 = time.time()
 	print(t1 - t0)
 	return t1-t0
