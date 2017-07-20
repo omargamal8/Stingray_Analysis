@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	current_dir = os.getcwd()
 	# current_dir +='/Lightcurve'
 	modules = [dir for dir in os.listdir(current_dir) if os.path.isdir(current_dir+'/'+dir) if not dir == ".git" if not dir == "__pycache__"]
-	modules = [modules[-1]]
+	modules = [modules[0]]
 	print(modules)
 	# print(modules)
 
@@ -30,17 +30,16 @@ if __name__ == '__main__':
 			print("Module",module)
 			module_fullpath = current_dir + '/' + module + '/'
 			SingleTests = findSingleTest(module_fullpath)
-			if SingleTests == None:
+			SingleTests = [module_fullpath+'coherence/Static_SegmentSize/',module_fullpath+'time_lag/Static_SegmentSize/']
+			if SingleTests == None or SingleTests==[]:
 				print("SingleTest.py not found in " + module)
 				continue
 			else:
 				print(SingleTests)
-				for SingleTest in SingleTests:
-
-					print("Testing "+ SingleTest)
-					Tester = ContinuousTester(4,6,9)
-					# Tester.runTests(SingleTest)
-					# Tester.testAndWrite(SingleTest)
+				# for SingleTest in SingleTests:
+				# 	print("Testing "+ SingleTest)
+				# 	Tester = ContinuousTester(4,4,9)
+				# 	Tester.testAndWrite(SingleTest)
 					# plotter.plotAndSaveFromRaw(SingleTest+"/TimeProfiles/plotting_values.txt")
 			print("Plots in Module")
 			plotter.plotGroup(module_fullpath)

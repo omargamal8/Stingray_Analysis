@@ -82,9 +82,9 @@ if __name__ == "__main__":
 		initial_power = int(input("Initial Power:"))
 		final_power = int(input("Final Power:"))
 		upper_base = int(input("Final Base:"))
-		write = input("enter \"-w\" if you want to write the results")
+		write = input("enter \"-w\" if you want to write the results ")
 		test_arg.append(write)
-		Single_Test_Dir = input("Single test dir")
+		Single_Test_Dir = input("Single test dir ")
 	else:
 		try:
 			initial_power = int(test_arg[1])

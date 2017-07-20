@@ -14,21 +14,26 @@ def calculate_size(number):
 
 
 def singleTest(base,power):
-	print("--Sort SingleTest--")
-	dt = 0.03125
-	lc_size = base * (10 ** power)
-	final_element = dt * lc_size
-	times1 = np.arange(0,final_element,dt)
-	counts1 = np.random.rand(lc_size) * 100
+	try:
+		print("--Sort SingleTest--")
+		dt = 0.03125
+		lc_size = base * (10 ** power)
+		final_element = dt * lc_size
+		times1 = np.arange(0,final_element,dt)
+		counts1 = np.random.rand(lc_size) * 100
 
-	lc1 = Lightcurve(times1, counts1)
+		lc1 = Lightcurve(times1, counts1)
 
-	t0 = time.time()
-	lc1.sort()
-	t1 = time.time()
-	
-	print(t1 - t0)
-	return t1-t0
+		t0 = time.time()
+		lc1.sort()
+		t1 = time.time()
+		
+		print(t1 - t0)
+		return t1-t0
+	except:
+		print("Exceptiooooon")
+		del lc1
+		return
 # size of the lightcurve to be tested with is equal to |base * 10^pow|
 
 
