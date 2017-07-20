@@ -18,25 +18,33 @@ def dictToLists(dict):
 	for key in dict:
 		keys.append(key)
 		values.append(dict[key])
-	return[keys,values]	
+	return[list(dict.keys()),list(values)]	
 
-def readValues(path):
+def _readValues(path):
 	input_file = open(path, "r")
+	print("Input Path", input_file)
 	lines = input_file.readlines()
 	values = OrderedDict()
 	input_file.close()
 
-	key_gen = test_value_gen()
 	for line in lines:
 	   if line == "\n":
 	   	continue
-	   values[next(key_gen)/10 ** 3] = float((line.split(':')[1]))
+	   print("__line:",line)
+	   bins,value = line.split(':')
+	   print("bins: "+bins+" : value "+value)
+	   value = float(value)
+	   bins = int(bins)
+	   bins/=1000 
+	   values[bins] = float(value)
+	print(values.values())
 	return values
 
 def plotAndSaveFromRaw(path):
-	values = readValues(path)
+	values = _readValues(path)
 	valkeys = dictToLists(values)
 	plt.clf()
+	# print(valkeys[1])
 	plt.plot(valkeys[0], valkeys[1],'b')
 	plt.xlabel("bins  1:1000")
 	plt.ylabel("seconds")
@@ -47,7 +55,7 @@ def plotAndSaveFromRaw(path):
 	plt.savefig(output_dir+"timefig.png")
 
 def nextColor():
-	colors = ['b','m','y','k','r','g','b--','m--','y--','k--', 'r--','g--']
+	colors = ['b','m','y','k','b--','m--','y--','k--','r','g','r--','g--']
 	for color in colors:
 		yield color
 def plotGroup(topDir):
@@ -61,7 +69,7 @@ def plotGroup(topDir):
 	for path in paths:
 		laf+=1
 		print(laf)
-		values = readValues(path+'/plotting_values.txt')
+		values = _readValues(path+'/plotting_values.txt')
 		valkeys = dictToLists(values)
 		plt.plot(valkeys[0], valkeys[1], next(colors))
 		subdirs = path.split('/')
@@ -72,6 +80,7 @@ def plotGroup(topDir):
 		legend.append(label)
 	plt.xlabel("bins 1:1000")
 	plt.ylabel("seconds")
+	plt.suptitle(topDir.split('/')[-2])
 	plt.legend(legend)
 	plt.show()
 
@@ -92,8 +101,12 @@ if __name__ == "__main__":
 		plotAndSaveFromRaw(input_path)
 
 	else:
-		values1 = readValues(input_path)
+		values1 = _readValues(input_path)
+		# print("aa")
+		# print(values1.keys())
+		# print(values1.values())
 		valkeys1 = dictToLists(values1)
+		plt.clf()
 
 		# values2 = readValues("./plotting_values_worst.txt")
 		# valkeys2 = dictToLists(values2)
