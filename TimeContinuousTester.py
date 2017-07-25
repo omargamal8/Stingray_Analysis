@@ -22,6 +22,14 @@ class ContinuousTester:
 			output_file.write(strToBeWritten+'\n')
 		output_file.close()
 
+	def appendResult(self,key,value,dir):
+		if not (os.path.isdir(dir+"/TimeProfiles")):
+			os.mkdir(dir+"/TimeProfiles")
+		output_file_path = dir+"/TimeProfiles/backup.txt"
+		output_file = open(output_file_path,"a")
+		output_file.write(str(key)+":"+str(value)+"\n")
+		output_file.close()
+
 	def runTests(self,Single_Test_Dir):
 		print("Run Tests!! for dir ",Single_Test_Dir)
 
@@ -59,6 +67,7 @@ class ContinuousTester:
 					avg_time = accumulative_time/attempts
 					print(avg_time,"\n")
 					times[base*(10 ** power)] = avg_time
+					self.appendResult(base*(10 ** power),avg_time,Single_Test_Dir)
 				except MemoryError:
 					print("Memory errored, submitting results..")
 					break
