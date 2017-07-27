@@ -567,7 +567,7 @@ class AveragedCrossspectrum(Crossspectrum):
                 bin_intervals_from_gtis(self.gti, segment_size, lc1.time,
                                     dt=lc1.dt)
     
-        def _create_segments_spectrum(self, start_inds, end_inds):
+        def _create_segments_spectrum(start_inds, end_inds):
                 cs_all = []
                 nphots1_all = []
                 nphots2_all = []
@@ -601,22 +601,28 @@ class AveragedCrossspectrum(Crossspectrum):
 
         processes_count = cpu_count()
         tasks = []
-        for i in range(processes):
-            process_share = int( len(start_inds) / processes_count )
-            starting_index = i * process_share
-            ending_index = (starting_index + process_share) % len(start_inds)
-            tasks.append(delayed(_create_segments_spectrum)(start_inds[starting_index:ending_index], end_inds[starting_index:ending_index]))
+        if(processes_count < len(start_inds)):
+            for i in range(processes_count):
+                process_share = int( len(start_inds) / processes_count )
+                starting_index = i * process_share
+                ending_index = (starting_index + process_share) % len(start_inds)
+                tasks.append(delayed(_create_segments_spectrum)(start_inds[starting_index:ending_index], end_inds[starting_index:ending_index]))
+        else:
+            i = 0
+            while(i<len(start_inds)):
+                tasks.append(delayed(_create_segments_spectrum)(start_inds[i:i+1], end_inds[i:i+1]))
+                i+=1
         cs_all = []
         nphotos1_all = []
         nphotos2_all = []
 
         results = compute(*tasks, get = dask.multiprocessing.get)
         for cs, nphoto1, nphoto2 in list(results):
-            cs_all.append(cs)
-            nphotos1_all.append(nphoto1)
-            nphotos2_all.append(nphotos2)
+            cs_all+=(cs)
+            nphotos1_all+=(nphoto1)
+            nphotos2_all+=(nphoto2)
         
-    
+        return cs_all, nphotos1_all, nphotos2_all
 
     def _make_crossspectrum(self, lc1, lc2):
 

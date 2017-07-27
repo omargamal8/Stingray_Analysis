@@ -20,11 +20,8 @@ valid_statistics = ["poisson", "gauss", None]
 
 
 class Lightcurve(object):
-    # def __init__(self, time, counts, err=None, input_counts=True,
-    #              gti=None, err_dist='poisson', mjdref=0, dt=None):
-    def __init__(self):
-        print("took over")
-        return
+    def __init__(self, time, counts, err=None, input_counts=True,
+                 gti=None, err_dist='poisson', mjdref=0, dt=None):
         """
         Make a light curve object from an array of time stamps and an
         array of counts.
