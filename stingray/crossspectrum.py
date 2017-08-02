@@ -601,11 +601,12 @@ class AveragedCrossspectrum(Crossspectrum):
             for array in arr:
                 concatenation += array
             return concatenation
-        cs_all, nphotos1_all, nphotos2_all = \
+
+        cs_all, nphots1_all, nphots2_all = \
         stingray_parallel.execute_parallel(_create_segments_spectrum,
                                         [_append,_append,_append], start_inds, end_inds)
-        
-        return cs_all, nphotos1_all, nphotos2_all
+
+        return cs_all, nphots1_all, nphots2_all
 
     def _make_crossspectrum(self, lc1, lc2):
 

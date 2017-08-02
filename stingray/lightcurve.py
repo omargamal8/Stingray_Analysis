@@ -613,31 +613,43 @@ class Lightcurve(object):
                                     " Please use one of these: "
                                     "{}".format(valid_statistics))
 
+            def appending_counters(arr):
+                total = Counter()
+                for count in arr:
+                   total.update(count)
+                return total
+
 
             from collections import Counter
             counts = Counter()
             counts_err = Counter()
 
-            # def _initialize_counter(first_lc):
-            for i, time in enumerate(first_lc.time):
-                counts[time] = first_lc.counts[i]
-                counts_err[time] = first_lc.counts_err[i]
-        # stingray_parallel.execute_parallel(_initialize_counter, [lambda arr:None], first_lc)
-            # print(list(counts.keys()))
-            # def _join_common( second_lc):
+            def _initialize_counter(first_lc):
+	            for i, time in enumerate(first_lc.time):
+	                counts[time] = first_lc.counts[i]
+	                counts_err[time] = first_lc.counts_err[i]
+	            return counts, counts_err
+
+
+            counts, counts_err = stingray_parallel.execute_parallel(_initialize_counter, [appending_counters,appending_counters],first_lc)
+            print(list(counts.keys()))
+
+            def _join_common( second_lc):
                 
-            for i, time in enumerate(second_lc.time):
+	            for i, time in enumerate(second_lc.time):
+	            
+	                if (counts.get(time) != None): #Common time
+
+	                    counts[time] = (counts[time] + second_lc.counts[i]) / 2  #avg
+	                    counts_err[time] = np.sqrt(( ((counts_err[time]**2) + (second_lc.counts_err[i] **2)) / 2))
+
+	                else:
+	                    counts[time] = second_lc.counts[i]
+	                    counts_err[time] = second_lc.counts_err[i]
+
+	            return counts, counts_err
             
-                if (counts.get(time) != None): #Common time
-
-                    counts[time] = (counts[time] + second_lc.counts[i]) / 2  #avg
-                    counts_err[time] = np.sqrt(( ((counts_err[time]**2) + (second_lc.counts_err[i] **2)) / 2))
-
-                else:
-                    counts[time] = second_lc.counts[i]
-                    counts_err[time] = second_lc.counts_err[i]
-
-            # stingray_parallel.execute_parallel(_join_common, [lambda arr:None], second_lc)
+            counts, counts_err = stingray_parallel.execute_parallel(_join_common, [appending_counters, appending_counters], second_lc)
             new_time = list(counts.keys())
             new_counts = list(counts.values())
             if(valid_err):
