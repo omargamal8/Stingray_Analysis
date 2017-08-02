@@ -8,6 +8,7 @@ import logging
 import numpy as np
 import stingray.io as io
 import stingray.utils as utils
+import stingray_parallel
 from stingray.exceptions import StingrayError
 from stingray.utils import simon, assign_value_if_none, baseline_als
 from stingray.gti import cross_two_gtis, join_gtis, gti_border_bins
@@ -602,7 +603,7 @@ class Lightcurve(object):
             if self.err_dist.lower() != other.err_dist.lower():
                 simon("Lightcurves have different statistics!"
                       "We are setting the errors to zero.")
-                new_counts_err = np.zeros_like(new_counts)
+
 
             elif self.err_dist.lower() in valid_statistics:
                 valid_err = True
@@ -617,13 +618,17 @@ class Lightcurve(object):
             counts = Counter()
             counts_err = Counter()
 
+            # def _initialize_counter(first_lc):
             for i, time in enumerate(first_lc.time):
                 counts[time] = first_lc.counts[i]
                 counts_err[time] = first_lc.counts_err[i]
-
+        # stingray_parallel.execute_parallel(_initialize_counter, [lambda arr:None], first_lc)
+            # print(list(counts.keys()))
+            # def _join_common( second_lc):
+                
             for i, time in enumerate(second_lc.time):
             
-                if (counts[time] != 0): #Common time
+                if (counts.get(time) != None): #Common time
 
                     counts[time] = (counts[time] + second_lc.counts[i]) / 2  #avg
                     counts_err[time] = np.sqrt(( ((counts_err[time]**2) + (second_lc.counts_err[i] **2)) / 2))
@@ -632,10 +637,13 @@ class Lightcurve(object):
                     counts[time] = second_lc.counts[i]
                     counts_err[time] = second_lc.counts_err[i]
 
+            # stingray_parallel.execute_parallel(_join_common, [lambda arr:None], second_lc)
             new_time = list(counts.keys())
             new_counts = list(counts.values())
             if(valid_err):
                 new_counts_err = list(counts_err.values())
+            else:
+                new_counts_err = np.zeros_like(new_counts)
             
             del[counts, counts_err]
 
@@ -930,4 +938,3 @@ class Lightcurve(object):
 
     def apply_gtis(self):
         good = create_gti_mask(self.time, lc.gti)
-

@@ -37,7 +37,8 @@ def singleTest(base,power):
 
 		# print("lc actual size:", len(lc1))
 
-		segment_size = ceil( lc_size * 0.0002 )
+		# segment_size = ceil( lc_size * 0.0002 )
+		segment_size = 1
 		print("Segment size:", segment_size)
 		t0 = time.time()
 		av_cs = AveragedCrossspectrum(lc1,lc2, segment_size)
