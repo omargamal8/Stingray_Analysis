@@ -32,12 +32,17 @@ def singleTest(base,power):
 
 
 
-		# times1 = np.arange(1,17)
-		# counts1 = np.arange(1,17)
+		times1 = np.arange(1,17)
+		counts1 = np.arange(1,17)
+		# print(times1)
+		# print(counts1)
 
-		# times2 = np.arange(8,25)
-		# counts2 = np.arange(16,50,2)
 
+		times2 = np.arange(8,24)
+		counts2 = np.concatenate([np.arange(12,21), np.arange(17,24)])
+		# print(times2)
+		# print(counts2)
+		
 		lc1 = Lightcurve(times1, counts1)
 		lc2 = Lightcurve(times2, counts2)
 
@@ -45,9 +50,11 @@ def singleTest(base,power):
 		t0 = time.time()
 		lc3 = lc1.join(lc2)
 		t1 = time.time()
-		print(t1 - t0)
+		# print(t1 - t0)
+		# print(lc3.time[0], lc3.counts[0])
 		# print(lc3.time)
 		# print(lc3.counts)
+		# print(len(lc3.counts))
 		return t1-t0
 	# except Exception as e:
 		# print("exception:", e)

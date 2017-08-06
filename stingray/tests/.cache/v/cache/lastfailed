@@ -1,4 +1,1 @@
-{
-  "test_crossspectrum.py::TestAveragedCrossspectrum::()::test_coherence": true,
-  "test_crossspectrum.py::TestAveragedCrossspectrum::()::test_with_iterable_of_lightcurves": true
-}
+{}

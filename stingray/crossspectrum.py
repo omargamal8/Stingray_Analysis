@@ -461,6 +461,7 @@ class AveragedCrossspectrum(Crossspectrum):
 
     def __init__(self, lc1=None, lc2=None, segment_size=None,
                  norm='none', gti=None):
+        print("Modified Avg CS")
         """
         Make an averaged cross spectrum from a light curve by segmenting two
         light curves, Fourier-transforming each segment and then averaging the
@@ -567,7 +568,7 @@ class AveragedCrossspectrum(Crossspectrum):
         start_inds, end_inds = \
                 bin_intervals_from_gtis(self.gti, segment_size, lc1.time,
                                     dt=lc1.dt)
-    
+        _norm = self.norm
         def _create_segments_spectrum(start_inds, end_inds):
             cs_all = []
             nphots1_all = []
@@ -590,7 +591,7 @@ class AveragedCrossspectrum(Crossspectrum):
                                      gti=[[time_2[0] - lc2.dt/2,
                                            time_2[-1] + lc2.dt / 2]],
                                      dt=lc2.dt)
-                cs_seg = Crossspectrum(lc1_seg, lc2_seg, norm=self.norm)
+                cs_seg = Crossspectrum(lc1_seg, lc2_seg, norm=_norm)
                 cs_all.append(cs_seg)
                 nphots1_all.append(np.sum(lc1_seg.counts))
                 nphots2_all.append(np.sum(lc2_seg.counts))
@@ -629,6 +630,7 @@ class AveragedCrossspectrum(Crossspectrum):
             self.cs_all, nphots1_all, nphots2_all = [], [], []
             # TODO: should be using izip from iterables if lc1 or lc2 could
             # be long
+            #av
             for lc1_seg, lc2_seg in zip(lc1, lc2):
 
                 if self.type == "crossspectrum":

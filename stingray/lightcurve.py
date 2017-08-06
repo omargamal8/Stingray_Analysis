@@ -633,6 +633,7 @@ class Lightcurve(object):
 
             counts, counts_err = stingray_parallel.execute_parallel(_initialize_counter, [appending_counters,appending_counters],first_lc)
             print(list(counts.keys()))
+            print(list(counts.values()))
 
             def _join_common( second_lc):
                 
@@ -650,6 +651,9 @@ class Lightcurve(object):
 	            return counts, counts_err
             
             counts, counts_err = stingray_parallel.execute_parallel(_join_common, [appending_counters, appending_counters], second_lc)
+            print(list(counts.keys()))
+            print(list(counts.values()))
+            
             new_time = list(counts.keys())
             new_counts = list(counts.values())
             if(valid_err):
