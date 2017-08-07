@@ -25,6 +25,7 @@ def singleTest():
 		print("Segment size:", segment_size)
 		t0 = time.time()
 		av_cs = AveragedCrossspectrum(lc1,lc2, segment_size)
+		av_cs.coherence()
 		t1 = time.time()
 		print(t1 - t0)
 		return t1-t0
