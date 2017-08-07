@@ -32,19 +32,22 @@ def singleTest(base,power):
 
 
 
-		times1 = np.arange(1,17)
-		counts1 = np.arange(1,17)
+		# times1 = np.arange(1,17)
+		# counts1 = np.arange(1,17)
 		# print(times1)
 		# print(counts1)
 
-
-		times2 = np.arange(8,24)
-		counts2 = np.concatenate([np.arange(12,21), np.arange(17,24)])
+        #
+		# times2 = np.arange(8,24)
+		# counts2 = np.concatenate([np.arange(12,21), np.arange(17,24)])
 		# print(times2)
 		# print(counts2)
-		
+
+		t0 = time.time()
 		lc1 = Lightcurve(times1, counts1)
+		t1 = time.time()
 		lc2 = Lightcurve(times2, counts2)
+		print("LightCurve took:",t1-t0)
 
 
 		t0 = time.time()
@@ -79,6 +82,7 @@ if __name__ == '__main__':
 
 	# print("Lightcurve initialization took:", t1-t0)
 
+	print(result)
 	# time.sleep(4)
 	# sys.exit()
 

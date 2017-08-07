@@ -87,8 +87,10 @@ def _execute_dask(work, list_of_operations, *args):
 		from multiprocessing import cpu_count
 		from dask import compute, delayed
 		import dask.multiprocessing
+		import dask.threaded
 	except:
 		return uninstalled
+	return uninstalled
 	processes_count = cpu_count()
 	tasks = []
 	intervals = args[0]
@@ -112,9 +114,8 @@ def _execute_dask(work, list_of_operations, *args):
             if(ending_index > starting_index):
             	tasks.append(delayed(work)(*process_args))
 
-	list_of_results = list( compute(*tasks, get = dask.multiprocessing.get) )
-	# list_of_results = delayed(list)(tasks)
-	# list_of_results = list_of_results.compute(get = dask.multiprocessing.get)
+	list_of_results = list( compute(*tasks, get = dask.threaded.get) )
+
 	return _post_processing(list_of_results, list_of_operations)
 
 

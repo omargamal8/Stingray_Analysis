@@ -1,4 +1,5 @@
 import stingray_parallel
+from numba import jit
 import numpy as np
 class _class:
 	def _make_cross(self,gen_obj):

@@ -15,6 +15,8 @@ from stingray.gti import cross_two_gtis, join_gtis, gti_border_bins
 from stingray.gti import check_gtis, create_gti_mask
 from astropy.stats import poisson_conf_interval
 
+from numba import jit
+
 __all__ = ["Lightcurve"]
 
 valid_statistics = ["poisson", "gauss", None]
@@ -613,28 +615,25 @@ class Lightcurve(object):
                                     " Please use one of these: "
                                     "{}".format(valid_statistics))
 
-            def appending_counters(arr):
-                total = Counter()
-                for count in arr:
-                   total.update(count)
-                return total
 
 
             from collections import Counter
             counts = Counter()
             counts_err = Counter()
 
+            # @jit
             def _initialize_counter(first_lc):
 	            for i, time in enumerate(first_lc.time):
 	                counts[time] = first_lc.counts[i]
 	                counts_err[time] = first_lc.counts_err[i]
-	            return counts, counts_err
+	            # return counts, counts_err
 
 
-            counts, counts_err = stingray_parallel.execute_parallel(_initialize_counter, [appending_counters,appending_counters],first_lc)
-            print(list(counts.keys()))
-            print(list(counts.values()))
+            stingray_parallel.execute_parallel(_initialize_counter, [lambda _:None],first_lc)
+            # print(list(counts.keys()))
+            # print(list(counts.values()))
 
+            # @jit
             def _join_common( second_lc):
                 
 	            for i, time in enumerate(second_lc.time):
@@ -648,11 +647,11 @@ class Lightcurve(object):
 	                    counts[time] = second_lc.counts[i]
 	                    counts_err[time] = second_lc.counts_err[i]
 
-	            return counts, counts_err
+	            # return counts, counts_err
             
-            counts, counts_err = stingray_parallel.execute_parallel(_join_common, [appending_counters, appending_counters], second_lc)
-            print(list(counts.keys()))
-            print(list(counts.values()))
+            stingray_parallel.execute_parallel(_join_common, [lambda _:None], second_lc)
+            # print(list(counts.keys()))
+            # print(list(counts.values()))
             
             new_time = list(counts.keys())
             new_counts = list(counts.values())

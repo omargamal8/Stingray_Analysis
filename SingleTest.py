@@ -11,17 +11,21 @@ def singleTest():
 
 		print("--AveragedCrossSpec: __init__ SingleTest--")
 
-		times = np.arange(1,17)
-		counts = np.arange(10,170,10)
+		# times = np.arange(1,17)
+		# counts = np.arange(10,170,10)
 
-		counts2 = np.arange(0.1, 1.7, 0.1)
+		# counts2 = np.arange(0.1, 1.7, 0.1)
+
+		times = np.arange(10 ** 6)
+		counts = np.arange(10 ** 6)
+		counts2 = np.arange(10 ** 6)
 		lc1 = Lightcurve(times, counts)
 		lc2 = Lightcurve(times, counts2)
 
 
 
 		# segment_size = ceil( lc_size * 0.0002 )
-		segment_size = 2
+		segment_size = 100
 		print("Segment size:", segment_size)
 		t0 = time.time()
 		av_cs = AveragedCrossspectrum(lc1,lc2, segment_size)

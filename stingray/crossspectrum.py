@@ -12,6 +12,8 @@ from stingray.utils import rebin_data, simon
 from stingray.exceptions import StingrayError
 from stingray.gti import cross_two_gtis, bin_intervals_from_gtis, check_gtis
 
+from numba import jit
+
 __all__ = ["Crossspectrum", "AveragedCrossspectrum", "coherence"]
 
 
@@ -569,6 +571,8 @@ class AveragedCrossspectrum(Crossspectrum):
                 bin_intervals_from_gtis(self.gti, segment_size, lc1.time,
                                     dt=lc1.dt)
         _norm = self.norm
+
+        @jit
         def _create_segments_spectrum(start_inds, end_inds):
             cs_all = []
             nphots1_all = []
