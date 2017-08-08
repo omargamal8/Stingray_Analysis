@@ -5,14 +5,14 @@ import scipy
 import scipy.stats
 import scipy.fftpack
 import scipy.optimize
-import stingray_parallel
 
+
+from stingray_parallel import post_concat_arrays, execute_parallel
 from stingray.lightcurve import Lightcurve
 from stingray.utils import rebin_data, simon
 from stingray.exceptions import StingrayError
 from stingray.gti import cross_two_gtis, bin_intervals_from_gtis, check_gtis
 
-from numba import jit
 
 __all__ = ["Crossspectrum", "AveragedCrossspectrum", "coherence"]
 
@@ -572,7 +572,6 @@ class AveragedCrossspectrum(Crossspectrum):
                                     dt=lc1.dt)
         _norm = self.norm
 
-        @jit
         def _create_segments_spectrum(start_inds, end_inds):
             cs_all = []
             nphots1_all = []
@@ -601,15 +600,12 @@ class AveragedCrossspectrum(Crossspectrum):
                 nphots2_all.append(np.sum(lc2_seg.counts))
             return cs_all, nphots1_all, nphots2_all
 
-        def _append(arr):
-            concatenation = []
-            for array in arr:
-                concatenation += array
-            return concatenation
 
         cs_all, nphots1_all, nphots2_all = \
-        stingray_parallel.execute_parallel(_create_segments_spectrum,
-                                        [_append,_append,_append], start_inds, end_inds)
+        execute_parallel(_create_segments_spectrum,
+                        [post_concat_arrays,post_concat_arrays,post_concat_arrays],
+                         start_inds, end_inds,
+                         jit = False, shared_res = True)
 
         return cs_all, nphots1_all, nphots2_all
 
