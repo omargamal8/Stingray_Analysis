@@ -580,6 +580,7 @@ class Lightcurve(object):
         >>> lc.counts
         array([ 300,  100,  400,  600, 1200,  800])
         """
+        print("Analysis LC.Join")
         if self.mjdref != other.mjdref:
             raise ValueError("MJDref is different in the two light curves")
 
@@ -621,7 +622,7 @@ class Lightcurve(object):
             counts = Counter()
             counts_err = Counter()
 
-            # @jit
+            @jit
             def _initialize_counter(first_lc):
 	            for i, time in enumerate(first_lc.time):
 	                counts[time] = first_lc.counts[i]
@@ -633,7 +634,7 @@ class Lightcurve(object):
             # print(list(counts.keys()))
             # print(list(counts.values()))
 
-            # @jit
+            @jit
             def _join_common( second_lc):
                 
 	            for i, time in enumerate(second_lc.time):
