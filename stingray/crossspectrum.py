@@ -7,7 +7,7 @@ import scipy.fftpack
 import scipy.optimize
 
 
-from stingray_parallel import post_concat_arrays, execute_parallel
+from stingray.parallel import post_concat_arrays, execute_parallel
 from stingray.lightcurve import Lightcurve
 from stingray.utils import rebin_data, simon
 from stingray.exceptions import StingrayError

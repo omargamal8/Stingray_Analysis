@@ -38,7 +38,6 @@ will be created. Run the work function and then combine their returned values an
 """
 
 def _execute_dask(work, list_of_operations, *args, **kwargs):
-	return uninstalled
 	"""
 	This function works as follow:
 	1- Check how many cores are availble
@@ -103,12 +102,14 @@ def _execute_dask(work, list_of_operations, *args, **kwargs):
 		from dask import compute, delayed
 		import dask.multiprocessing
 		import dask.threaded
-		if(kwargs['jit'] != False):
+		if(kwargs.get('jit') == None or kwargs['jit'] == True):
 			from numba import jit
-	except:
+			print("jit imported ")
+	except Exception as e: 
+		print('exception', e)
 		return uninstalled
 
-	processes_count = cpu_count()
+	processes_count = cpu_count() if kwargs.get("cpus") == None else kwargs["cpus"]
 	tasks = []
 	intervals = args[0]
 	for i in range(processes_count):

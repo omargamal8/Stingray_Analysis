@@ -8,7 +8,7 @@ import logging
 import numpy as np
 import stingray.io as io
 import stingray.utils as utils
-import stingray_parallel
+import stingray.parallel
 from stingray.exceptions import StingrayError
 from stingray.utils import simon, assign_value_if_none, baseline_als
 from stingray.gti import cross_two_gtis, join_gtis, gti_border_bins
