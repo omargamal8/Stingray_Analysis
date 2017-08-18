@@ -4,18 +4,16 @@ Definition of :class:`Lightcurve`.
 :class:`Lightcurve` is used to create light curves out of photon counting data
 or to save existing light curves in a class that's easy to use.
 """
+from __future__ import division, print_function
 import logging
 import numpy as np
 import stingray.io as io
 import stingray.utils as utils
-import stingray.parallel
 from stingray.exceptions import StingrayError
 from stingray.utils import simon, assign_value_if_none, baseline_als
 from stingray.gti import cross_two_gtis, join_gtis, gti_border_bins
-from stingray.gti import check_gtis, create_gti_mask
+from stingray.gti import check_gtis, create_gti_mask, bin_intervals_from_gtis
 from astropy.stats import poisson_conf_interval
-
-from numba import jit
 
 __all__ = ["Lightcurve"]
 
@@ -159,8 +157,9 @@ class Lightcurve(object):
                 err_low, err_high = poisson_conf_interval(np.asarray(counts),
                     interval='frequentist-confidence', sigma=1)
                 # calculate approximately symmetric uncertainties
-                err = (np.absolute(err_low) + np.absolute(err_high) -
-                       2 * np.asarray(counts))/2.0
+                err_low -= np.asarray(counts)
+                err_high -= np.asarray(counts)
+                err = (np.absolute(err_low) + np.absolute(err_high))/2.0
                 # other estimators can be implemented for other statistics
             else:
                 simon("Stingray only uses poisson err_dist at the moment, "
@@ -507,7 +506,7 @@ class Lightcurve(object):
 
         return Lightcurve(time, counts, gti=gti, mjdref=mjdref, dt=dt)
 
-    def rebin(self, dt_new, method='sum'):
+    def rebin(self, dt_new=None, f=None, method='sum'):
         """
         Rebin the light curve to a new time resolution. While the new
         resolution need not be an integer multiple of the previous time
@@ -524,12 +523,23 @@ class Lightcurve(object):
             This keyword argument sets whether the counts in the new bins
             should be summed or averaged.
 
+        Other Parameters
+        ----------------
+        f: float
+            the rebin factor. If specified, it substitutes dt_new with
+            f*self.dt
 
         Returns
         -------
         lc_new: :class:`Lightcurve` object
             The :class:`Lightcurve` object with the new, binned light curve.
         """
+
+        if f is None and dt_new is None:
+            raise ValueError('You need to specify at least one between f and '
+                             'dt_new')
+        elif f is not None:
+            dt_new = f * self.dt
 
         if dt_new < self.dt:
             raise ValueError("New time resolution must be larger than "
@@ -580,7 +590,6 @@ class Lightcurve(object):
         >>> lc.counts
         array([ 300,  100,  400,  600, 1200,  800])
         """
-        print("Analysis LC.Join")
         if self.mjdref != other.mjdref:
             raise ValueError("MJDref is different in the two light curves")
 
@@ -617,43 +626,25 @@ class Lightcurve(object):
                                     "{}".format(valid_statistics))
 
 
-
             from collections import Counter
             counts = Counter()
             counts_err = Counter()
 
-            @jit
-            def _initialize_counter(first_lc):
-	            for i, time in enumerate(first_lc.time):
-	                counts[time] = first_lc.counts[i]
-	                counts_err[time] = first_lc.counts_err[i]
-	            # return counts, counts_err
+            for i, time in enumerate(first_lc.time):
+                counts[time] = first_lc.counts[i]
+                counts_err[time] = first_lc.counts_err[i]
 
-
-            stingray_parallel.execute_parallel(_initialize_counter, [lambda _:None],first_lc)
-            # print(list(counts.keys()))
-            # print(list(counts.values()))
-
-            @jit
-            def _join_common( second_lc):
-                
-	            for i, time in enumerate(second_lc.time):
-	            
-	                if (counts.get(time) != None): #Common time
-
-	                    counts[time] = (counts[time] + second_lc.counts[i]) / 2  #avg
-	                    counts_err[time] = np.sqrt(( ((counts_err[time]**2) + (second_lc.counts_err[i] **2)) / 2))
-
-	                else:
-	                    counts[time] = second_lc.counts[i]
-	                    counts_err[time] = second_lc.counts_err[i]
-
-	            # return counts, counts_err
+            for i, time in enumerate(second_lc.time):
             
-            stingray_parallel.execute_parallel(_join_common, [lambda _:None], second_lc)
-            # print(list(counts.keys()))
-            # print(list(counts.values()))
-            
+                if (counts.get(time) != None): #Common time
+
+                    counts[time] = (counts[time] + second_lc.counts[i]) / 2  #avg
+                    counts_err[time] = np.sqrt(( ((counts_err[time]**2) + (second_lc.counts_err[i] **2)) / 2))
+
+                else:
+                    counts[time] = second_lc.counts[i]
+                    counts_err[time] = second_lc.counts_err[i]
+
             new_time = list(counts.keys())
             new_counts = list(counts.values())
             if(valid_err):
@@ -800,10 +791,128 @@ class Lightcurve(object):
 
         new_counts, new_time, new_counts_err = zip(*sorted(zip(self.counts, self.time, self.counts_err) , reverse=reverse))
 
-
         self.time = np.asarray(new_time)
         self.counts = np.asarray(new_counts)
         self.counts_err = np.asarray(new_counts_err)
+
+    def estimate_chunk_length(self, min_total_counts=100, min_time_bins=100):
+        """Choose a reasonable chunk length.
+
+        The user specifies a condition on the total counts in each chunk and
+        the minimum number of time bins.
+
+        Other Parameters
+        ----------------
+        min_total_counts : int
+            Minimum number of counts for each chunk
+        min_time_bins : int
+            Minimum number of time bins
+
+        Returns
+        -------
+        chunk_length : float
+            The length of the light curve chunks that satisfies the conditions
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> time = np.arange(150)
+        >>> count = np.zeros_like(time) + 3
+        >>> lc = Lightcurve(time, count)
+        >>> lc.estimate_chunk_length(min_total_counts=10, min_time_bins=3)
+        4.0
+        >>> lc.estimate_chunk_length(min_total_counts=10, min_time_bins=5)
+        5.0
+        >>> count[2:4] = 1
+        >>> lc = Lightcurve(time, count)
+        >>> lc.estimate_chunk_length(min_total_counts=3, min_time_bins=1)
+        4.0
+        """
+
+        rough_estimate = np.ceil(min_total_counts / self.meancounts) * self.dt
+
+        chunk_length = np.max([rough_estimate, min_time_bins * self.dt])
+
+        keep_searching = True
+        while keep_searching:
+            start_times, stop_times, results = \
+                self.analyze_lc_chunks(chunk_length, np.sum)
+            mincounts = np.min(results)
+            if mincounts >= min_total_counts:
+                keep_searching = False
+            else:
+                chunk_length *= np.ceil(min_total_counts / mincounts) * self.dt
+
+        return chunk_length
+
+    def analyze_lc_chunks(self, chunk_length, func, fraction_step=1, **kwargs):
+        """Analyze chunks of the light curve with any function.
+
+        Parameters
+        ----------
+        chunk_length : float
+            Length in seconds of the light curve chunks
+        func : function
+            Function accepting a `Lightcurve` object as single argument, plus
+            possible additional keyword arguments, and returning a number or a
+            tuple - e.g., (result, error) where both result and error are
+            numbers.
+
+        Other parameters
+        ----------------
+        fraction_step : float
+            If the step is not a full chunk_length but less (e.g. a moving window),
+            this indicates the ratio between step step and `chunk_length` (e.g.
+            0.5 means that the window shifts of half chunk_length)
+        kwargs : keyword arguments
+            These additional keyword arguments, if present, they will be passed
+            to `func`
+
+        Returns
+        -------
+        start_times : array
+            Lower time boundaries of all chunks.
+        stop_times : array
+            Higher time boundaries of all chunks.
+        result : array of N elements
+            The result of `func` for each chunk of the light curve
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> time = np.arange(0, 10, 0.1)
+        >>> counts = np.zeros_like(time) + 10
+        >>> lc = Lightcurve(time, counts)
+        >>> # Define a function that calculates the mean
+        >>> mean_func = lambda x: np.mean(x)
+        >>> # Calculate the mean in chunks of 5 seconds
+        >>> start, stop, res = lc.analyze_lc_chunks(5, mean_func)
+        >>> len(res) == 2
+        True
+        >>> np.all(res == 10)
+        True
+        """
+        start, stop = bin_intervals_from_gtis(self.gti, chunk_length,
+                                              self.time,
+                                              fraction_step=fraction_step,
+                                              dt=self.dt)
+        start_times = self.time[start] - self.dt * 0.5
+
+        # Remember that stop is one element above the last element, because
+        # it's defined to be used in intervals start:stop
+        stop_times = self.time[stop - 1] + self.dt * 1.5
+
+        results = []
+        for i, (st, sp) in enumerate(zip(start, stop)):
+            lc_filt = self[st:sp]
+            res = func(lc_filt, **kwargs)
+            results.append(res)
+
+        results = np.array(results)
+
+        if len(results.shape) == 2:
+            results = [results[:, i] for i in range(results.shape[1])]
+        return start_times, stop_times, results
 
     def plot(self, witherrors=False, labels=None, axis=None, title=None,
              marker='-', save=False, filename=None):
@@ -947,10 +1056,23 @@ class Lightcurve(object):
             new_lc = Lightcurve(self.time[start:stop], self.counts[start:stop],
                                 err=self.counts_err[start:stop],
                                 mjdref=self.mjdref, gti=[self.gti[i]],
-                                dt=self.dt)
+                                dt=self.dt, err_dist=self.err_dist)
             list_of_lcs.append(new_lc)
 
         return list_of_lcs
 
-    def apply_gtis(self):
-        good = create_gti_mask(self.time, lc.gti)
+    def _apply_gtis(self):
+        """Apply GTIs to a light curve after modification."""
+        check_gtis(self.gti)
+
+        good = create_gti_mask(self.time, self.gti)
+
+        self.time = self.time[good]
+        self.counts = self.counts[good]
+        self.counts_err = self.counts_err[good]
+        self.countrate = self.countrate[good]
+        self.countrate_err = self.countrate_err[good]
+
+        self.meanrate = np.mean(self.countrate)
+        self.meancounts = np.mean(self.counts)
+        self.n = self.counts.shape[0]

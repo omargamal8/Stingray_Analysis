@@ -37,7 +37,6 @@ def simon(message, **kwargs):
 
 
 def rebin_data(x, y, dx_new, yerr=None, method='sum'):
-
     """Rebin some data to an arbitrary new data resolution. Either sum
     the data points in the new bins or average them.
 
@@ -75,8 +74,8 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
         The size of the binning step
     """
 
-    y = np.asarray(y)
-    yerr = np.asarray(assign_value_if_none(yerr, np.zeros_like(y)))
+    # y = np.asarray(y)
+    # yerr = np.asarray(assign_value_if_none(yerr, np.zeros_like(y)))
 
     dx_old = x[1] - x[0]
 
@@ -89,7 +88,8 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
 
     
     intervals = np.arange(0,y.shape[0], step_size)
-    def wrapper(interval):
+
+    def wrapper(interval, que=None, index = 0):
         output = []
         outputerr = []
         for i in interval:
@@ -113,17 +113,14 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
                 totalerr += sum(yerr[int(i+1):int(step_size)]**2)
                 output.append(total)
                 outputerr.append(np.sqrt(totalerr))
-        
-        # return output, outputerr
+        if que == None:
+            return output, outputerr
+        else:
+            que.put([output,outputerr])
 
-    # print((y.shape[0]))
-    # print(step_size)
     from stingray.parallel import execute_parallel, _execute_sequential, post_concat_arrays
-    # output, outputerr = execute_parallel(wrapper, [post_concat_arrays, post_concat_arrays], intervals)
-    execute_parallel(wrapper, [lambda a:None], intervals)
-    # _execute_sequential(wrapper, y)
-    output = x
-    outputerr = y
+    output, outputerr = execute_parallel(wrapper, [post_concat_arrays, post_concat_arrays], intervals, jit = False)
+    
     output = np.asarray(output)
     outputerr = np.asarray(outputerr)
 
