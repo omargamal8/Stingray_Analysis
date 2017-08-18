@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+from __future__ import division
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import numpy as np
 
 import pytest

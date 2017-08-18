@@ -33,7 +33,11 @@ class TestLightcurve(object):
         Demonstrate that we can create a trivial Lightcurve object.
         """
         lc = Lightcurve(self.times, self.counts)
+<<<<<<< HEAD
 	
+=======
+    
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_irregular_time_warning(self):
         """
         Check if inputting an irregularly spaced time iterable throws out
@@ -89,6 +93,43 @@ class TestLightcurve(object):
         lc = Lightcurve(self.times, self.counts)
         assert lc.n == 4
 
+<<<<<<< HEAD
+=======
+    def test_analyze_lc_chunks(self):
+        lc = Lightcurve(self.times, self.counts, gti=self.gti)
+
+        def func(lc):
+            return lc.time[0]
+        start, stop, res = lc.analyze_lc_chunks(2, func)
+        assert start[0] == 0.5
+        assert np.all(start + lc.dt / 2 == res)
+
+    def test_analyze_lc_chunks_fvar_fracstep(self):
+        dt = 0.1
+        tstart = 0
+        tstop = 100
+        times = np.arange(tstart, tstop, dt)
+        gti = np.array([[tstart - dt/2, tstop - dt/2]])
+        # Simulate something *clearly* non-constant
+        counts = np.random.poisson(
+            10000 + 2000 * np.sin(2 * np.pi * times))
+
+        lc = Lightcurve(times, counts, gti=gti)
+
+        def excvar(lc):
+            from stingray.utils import excess_variance
+            return excess_variance(lc, normalization='fvar')
+
+        start, stop, res = lc.analyze_lc_chunks(20, excvar, fraction_step=0.5)
+        # excess_variance returns fvar and fvar_err
+        res, res_err = res
+
+        assert np.allclose(start[0], gti[0, 0])
+        assert np.all(res > 0)
+        # This must be a clear measurement of fvar
+        assert np.all(res > res_err)
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_bin_edges(self):
         bin_lo = [0.5,  1.5,  2.5,  3.5]
         bin_hi = [1.5,  2.5,  3.5,  4.5]
@@ -390,6 +431,33 @@ class TestLightcurve(object):
         assert len(lc.counts) == len(lc.time) == 6
         assert np.all(lc.counts == np.array([2, 2, 3, 3, 4, 4]))
 
+<<<<<<< HEAD
+=======
+    def test_join_different_err_dist_disjoint_times(self):
+        _times = [5 , 6, 7, 8]
+        _counts =[2, 2, 2, 2]
+
+        lc1 = Lightcurve(self.times, self.counts, err_dist = "poisson")
+        lc2 = Lightcurve(_times, _counts, err_dist = "gauss")
+
+        lc3 = lc1.join(lc2)
+
+        assert np.all(lc3.counts_err[:len(self.times)] == lc1.counts_err)
+        assert np.all(lc3.counts_err[len(self.times):] == np.zeros_like(lc2.counts))
+
+    def test_join_different_err_dist_overlapping_times(self):
+        _times = [3, 4, 5, 6]
+        _counts = [4, 4, 4, 4]
+
+        lc1 = Lightcurve(self.times, self.counts, err_dist = "poisson")
+        lc2 = Lightcurve(_times, _counts, err_dist = "gauss")
+        
+        with warnings.catch_warnings(record=True) as w:
+            lc3 = lc1.join(lc2)
+            assert "We are setting the errors to zero." in str(w[1].message)
+            assert np.all(lc3.counts_err == np.zeros_like(lc3.time))
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_truncate_by_index(self):
         lc = Lightcurve(self.times, self.counts, gti=self.gti)
 
@@ -586,6 +654,18 @@ class TestLightcurveRebin(object):
             self.lc.counts[0]*dt_new/self.lc.dt
         assert np.allclose(lc_binned.counts, counts_test)
 
+<<<<<<< HEAD
+=======
+    def test_rebin_even_factor(self):
+        f = 200
+        dt_new = f * self.lc.dt
+        lc_binned = self.lc.rebin(f=f)
+        assert np.isclose(dt_new, f * self.lc.dt)
+        counts_test = np.zeros_like(lc_binned.time) + \
+            self.lc.counts[0]*dt_new/self.lc.dt
+        assert np.allclose(lc_binned.counts, counts_test)
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_rebin_odd(self):
         dt_new = 1.5
         lc_binned = self.lc.rebin(dt_new)
@@ -595,6 +675,18 @@ class TestLightcurveRebin(object):
             self.lc.counts[0]*dt_new/self.lc.dt
         assert np.allclose(lc_binned.counts, counts_test)
 
+<<<<<<< HEAD
+=======
+    def test_rebin_odd_factor(self):
+        f = 100.5
+        dt_new = f * self.lc.dt
+        lc_binned = self.lc.rebin(f=f)
+        assert np.isclose(dt_new, f * self.lc.dt)
+        counts_test = np.zeros_like(lc_binned.time) + \
+            self.lc.counts[0]*dt_new/self.lc.dt
+        assert np.allclose(lc_binned.counts, counts_test)
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def rebin_several(self, dt):
         lc_binned = self.lc.rebin(dt)
         assert len(lc_binned.time) == len(lc_binned.counts)
@@ -614,3 +706,23 @@ class TestLightcurveRebin(object):
         lc = Lightcurve(times, counts, gti=gti)
         baseline = lc.baseline(10000, 0.01)
         assert np.all(lc.counts - baseline < 1)
+<<<<<<< HEAD
+=======
+
+    def test_change_mjdref(self):
+        lc_new = self.lc.change_mjdref(57000)
+        assert lc_new.mjdref == 57000
+
+    def test_apply_gtis(self):
+        time = np.arange(150)
+        count = np.zeros_like(time) + 3
+        lc = Lightcurve(time, count, gti=[[-0.5, 150.5]])
+        lc.gti = [[-0.5, 2.5], [12.5, 14.5]]
+        lc._apply_gtis()
+        assert lc.n == 5
+        assert np.all(lc.time == np.array([0, 1, 2, 13, 14]))
+        lc.gti = [[-0.5, 10.5]]
+        lc._apply_gtis()
+        assert lc.n == 3
+        assert np.all(lc.time == np.array([0, 1, 2]))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2

@@ -19,6 +19,10 @@ class TestSimulator(object):
     @classmethod
     def setup_class(self):
         self.simulator = simulator.Simulator(N=1024, mean=0.5, dt=0.125)
+<<<<<<< HEAD
+=======
+        self.simulator_odd = simulator.Simulator(N=2039, mean=0.5, dt=0.125)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def calculate_lag(self, lc, h, delay):
         """
@@ -54,9 +58,25 @@ class TestSimulator(object):
         """
         Simulate an energy channel.
         """
+<<<<<<< HEAD
         self.simulator.simulate_channel('3.5-4.5', 'lorenzian', [1, 2, 3, 4])
         self.simulator.delete_channel('3.5-4.5')
 
+=======
+        self.simulator.simulate_channel('3.5-4.5',
+                                        'generalized_lorentzian', [1, 2, 3, 4])
+        self.simulator.delete_channel('3.5-4.5')
+
+    def test_simulate_channel_odd(self):
+        """
+        Simulate an energy channel.
+        """
+        self.simulator_odd.simulate_channel('3.5-4.5',
+                                            'generalized_lorentzian',
+                                            [1, 2, 3, 4])
+        self.simulator_odd.delete_channel('3.5-4.5')
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_incorrect_simulate_channel(self):
         """Test simulating a channel that already exists."""
         self.simulator.simulate_channel('3.5-4.5', 2)
@@ -122,6 +142,15 @@ class TestSimulator(object):
         """
         assert len(self.simulator.simulate(2).counts), 1024
 
+<<<<<<< HEAD
+=======
+    def test_simulate_powerlaw_odd(self):
+        """
+        Simulate light curve from power law spectrum.
+        """
+        assert len(self.simulator_odd.simulate(2).counts), 2039
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_compare_powerlaw(self):
         """
         Compare simulated power spectrum with actual one.
@@ -150,6 +179,7 @@ class TestSimulator(object):
         s = np.random.rand(1024)
         assert len(self.simulator.simulate(s)), 1024
 
+<<<<<<< HEAD
     def test_simulate_lorenzian(self):
         """
         Simulate light curve using lorenzian model.
@@ -159,17 +189,45 @@ class TestSimulator(object):
     def test_compare_lorenzian(self):
         """
         Compare simulated lorenzian spectrum with original spectrum.
+=======
+    def test_simulate_lorentzian(self):
+        """
+        Simulate light curve using lorentzian model.
+        """
+        assert len(self.simulator.simulate('generalized_lorentzian',
+                                           [1, 2, 3, 4])), 1024
+
+    def test_simulate_lorentzian_odd(self):
+        """
+        Simulate light curve using lorentzian model.
+        """
+        assert len(self.simulator_odd.simulate('generalized_lorentzian',
+                                               [1, 2, 3, 4])), 1024
+
+    def test_compare_lorentzian(self):
+        """
+        Compare simulated lorentzian spectrum with original spectrum.
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         """
         N, red_noise, dt = 1024, 10, 1
 
         self.simulator = simulator.Simulator(N=N, dt=dt, mean=0.1,
                                              rms=0.4, red_noise=red_noise)
+<<<<<<< HEAD
         lc = [self.simulator.simulate('lorenzian', [0.3, 0.9, 0.6, 0.5])
+=======
+        lc = [self.simulator.simulate('generalized_lorentzian',
+                                      [0.3, 0.9, 0.6, 0.5])
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
               for i in range(1, 30)]
         simulated = self.simulator.powerspectrum(lc, lc[0].tseg)
 
         w = np.fft.rfftfreq(N, d=dt)[1:]
+<<<<<<< HEAD
         actual = models.lorenzian(w, [0.3, 0.9, 0.6, 0.5])[:-1]
+=======
+        actual = models.generalized_lorentzian(w, [0.3, 0.9, 0.6, 0.5])[:-1]
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         actual_prob = actual/float(sum(actual))
         simulated_prob = simulated/float(sum(simulated))
@@ -211,8 +269,25 @@ class TestSimulator(object):
         Simulate a light curve using the GeneralizedLorentz1D model
         called as a string
         """
+<<<<<<< HEAD
         assert len(self.simulator.simulate('GeneralizedLorentz1D', {'x_0':10, 'fwhm':1., 'value':10., 'power_coeff':2})), 1024
         
+=======
+        assert len(self.simulator.simulate('GeneralizedLorentz1D',
+                                           {'x_0':10, 'fwhm':1., 'value':10.,
+                                            'power_coeff':2})), 1024
+        
+    def test_simulate_GeneralizedLorentz1D_odd_str(self):
+        """
+        Simulate a light curve using the GeneralizedLorentz1D model
+        called as a string
+        """
+        assert len(self.simulator_odd.simulate('GeneralizedLorentz1D',
+                                               {'x_0':10, 'fwhm':1.,
+                                                'value':10., 'power_coeff':2}
+                                               )), 2039
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_simulate_GeneralizedLorentz1D(self):
         """
         Simulate a light curve using the GeneralizedLorentz1D model
@@ -226,14 +301,26 @@ class TestSimulator(object):
         Simulate a light curve using SmoothBrokenPowerLaw model
         called as a string
         """
+<<<<<<< HEAD
         assert len(self.simulator.simulate('SmoothBrokenPowerLaw', {'norm':1., 'gamma_low':1., 'gamma_high':2., 'break_freq':1.})), 1024
+=======
+        assert len(
+            self.simulator.simulate('SmoothBrokenPowerLaw',
+                                    {'norm':1., 'gamma_low':1.,
+                                     'gamma_high':2., 'break_freq':1.})), 1024
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     
     def test_simulate_SmoothBrokenPowerLaw(self):
         """
         Simulate a light curve using SmoothBrokenPowerLaw model
         called as a astropy.modeling.Model class
         """
+<<<<<<< HEAD
         mod = models.SmoothBrokenPowerLaw(norm=1., gamma_low=1., gamma_high=2., break_freq=1.)
+=======
+        mod = models.SmoothBrokenPowerLaw(norm=1., gamma_low=1., gamma_high=2.,
+                                          break_freq=1.)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         assert len(self.simulator.simulate(mod)), 1024
         
         
@@ -242,10 +329,26 @@ class TestSimulator(object):
         Simulate a light curve using a generic model
         called as a astropy.modeling.Model class
         """
+<<<<<<< HEAD
         mod = astropy.modeling.models.Gaussian1D(amplitude=10., mean=1., stddev=2.)
         assert len(self.simulator.simulate(mod)), 1024
         
         
+=======
+        mod = astropy.modeling.models.Gaussian1D(amplitude=10., mean=1.,
+                                                 stddev=2.)
+        assert len(self.simulator.simulate(mod)), 1024
+
+    def test_simulate_generic_model_odd(self):
+        """
+        Simulate a light curve using a generic model
+        called as a astropy.modeling.Model class
+        """
+        mod = astropy.modeling.models.Gaussian1D(amplitude=10., mean=1.,
+                                                 stddev=2.)
+        assert len(self.simulator_odd.simulate(mod)), 2039
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_compare_composite(self):
         """
         Compare the PSD of a light curve simulated using a composite model
@@ -257,8 +360,16 @@ class TestSimulator(object):
         m = 30000.
         
         self.simulator = simulator.Simulator(N=N, mean=m, dt=dt)
+<<<<<<< HEAD
         smoothbknpo = models.SmoothBrokenPowerLaw(norm=1., gamma_low=1., gamma_high=2., break_freq=1.)
         lorentzian = models.GeneralizedLorentz1D(x_0=10, fwhm=1., value=10., power_coeff=2.)
+=======
+        smoothbknpo = \
+            models.SmoothBrokenPowerLaw(norm=1., gamma_low=1., gamma_high=2.,
+                                        break_freq=1.)
+        lorentzian = models.GeneralizedLorentz1D(x_0=10, fwhm=1., value=10.,
+                                                 power_coeff=2.)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         myModel = smoothbknpo + lorentzian
         
         lc = [self.simulator.simulate(myModel) for i in range(1, 50)]
@@ -271,7 +382,12 @@ class TestSimulator(object):
         actual_prob = actual/float(sum(actual))
         simulated_prob = simulated/float(sum(simulated))
 
+<<<<<<< HEAD
         assert np.all(np.abs(actual_prob - simulated_prob) < 3*np.sqrt(actual_prob))
+=======
+        assert np.all(np.abs(actual_prob - simulated_prob) <
+                      3*np.sqrt(actual_prob))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         
         
     def test_simulate_wrong_model(self):
@@ -286,15 +402,43 @@ class TestSimulator(object):
         Construct simple impulse response.
         """
         t0, w = 100, 500
+<<<<<<< HEAD
         assert len(self.simulator.simple_ir(t0, w)), (t0+w)/self.simulator.dt
+=======
+        assert len(self.simulator.simple_ir(t0, w)) == \
+               (t0+w)/self.simulator.dt
+
+    def test_construct_simple_ir_odd(self):
+        """
+        Construct simple impulse response.
+        """
+        t0, w = 100, 500
+        assert len(self.simulator_odd.simple_ir(t0, w)) == \
+               (t0+w)/self.simulator.dt
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_construct_relativistic_ir(self):
         """
         Construct relativistic impulse response.
         """
         t1, t3 = 3, 10
+<<<<<<< HEAD
         assert len(self.simulator.relativistic_ir(t1=t1, t3=t3)),\
                   (t1+t3)/self.simulator.dt
+=======
+        ir = self.simulator.relativistic_ir(t1=t1, t3=t3)
+        assert np.all(ir[:int(t1 / self.simulator.dt)] == 0)
+        assert ir[int(t1 / self.simulator.dt)] == 1
+
+    def test_construct_relativistic_ir_odd(self):
+        """
+        Construct relativistic impulse response.
+        """
+        t1, t3 = 3, 10
+        ir = self.simulator_odd.relativistic_ir(t1=t1, t3=t3)
+        assert np.all(ir[:int(t1 / self.simulator_odd.dt)] == 0)
+        assert ir[int(t1 / self.simulator_odd.dt)] == 1
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_simulate_simple_impulse(self):
         """
@@ -305,12 +449,36 @@ class TestSimulator(object):
         h = self.simulator.simple_ir(10, 1, 1)
         output = self.simulator.simulate(s, h)
 
+<<<<<<< HEAD
+=======
+    def test_simulate_simple_impulse_odd(self):
+        """
+        Simulate light curve from simple impulse response.
+        """
+        lc = sampledata.sample_data()
+        s = lc.counts
+        h = self.simulator_odd.simple_ir(10, 1, 1)
+        output = self.simulator_odd.simulate(s, h)
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_powerspectrum(self):
         """
         Create a power spectrum from light curve.
         """
+<<<<<<< HEAD
         self.simulator.simulate(2)
         self.simulator.powerspectrum(self.simulator.lc)
+=======
+        lc = self.simulator.simulate(2)
+        self.simulator.powerspectrum(lc)
+
+    def test_powerspectrum_odd(self):
+        """
+        Create a power spectrum from light curve.
+        """
+        lc = self.simulator_odd.simulate(2)
+        self.simulator_odd.powerspectrum(lc)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_simulate_relativistic_impulse(self):
         """
@@ -332,6 +500,19 @@ class TestSimulator(object):
         h = self.simulator.simple_ir()
         output = self.simulator.simulate(s, h, 'filtered')
 
+<<<<<<< HEAD
+=======
+    def test_filtered_simulate_odd(self):
+        """
+        Simulate light curve using 'filtered' mode.
+        """
+        lc = sampledata.sample_data()
+        s = lc.counts
+
+        h = self.simulator_odd.simple_ir()
+        output = self.simulator_odd.simulate(s, h, 'filtered')
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_simple_lag_spectrum(self):
         """
         Simulate light curve from simple impulse response and
@@ -419,6 +600,7 @@ class TestSimulator(object):
         assert np.abs(5-h_cutoffs[0]) < np.sqrt(5)
         assert np.abs(5-h_cutoffs[1]) < np.sqrt(5)
 
+<<<<<<< HEAD
     def test_powerspectrum(self):
         """
         Create a powerspectrum from light curve.
@@ -426,6 +608,8 @@ class TestSimulator(object):
         lc = self.simulator.simulate(2)
         self.simulator.powerspectrum(lc)
 
+=======
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def test_io(self):
         sim = simulator.Simulator(N=1024)
         sim.write('sim.pickle')

@@ -20,7 +20,11 @@ from .gti import  _get_gti_from_extension, load_gtis
 
 try:
     # Python 2
+<<<<<<< HEAD
     import pickle as pickle
+=======
+    import cPickle as pickle
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 except:
     # Python 3
     import pickle
@@ -432,8 +436,13 @@ def _retrieve_hdf5_object(filename):
     """
 
     with h5py.File(filename, 'r') as hf:
+<<<<<<< HEAD
         dset_keys = list(hf.keys())
         attr_keys = list(hf.attrs.keys())
+=======
+        dset_keys = hf.keys()
+        attr_keys = hf.attrs.keys()
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         data = {}
 
         dset_copy = list(dset_keys)[:]
@@ -623,7 +632,11 @@ def _save_fits_object(object, filename, **kwargs):
         data = items[attr]
 
         # Get the index of table to which column belongs
+<<<<<<< HEAD
         if iscolsassigned and attr in list(colsassign.keys()):
+=======
+        if iscolsassigned and attr in colsassign.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             index = tables.index(colsassign[attr])
         else:
             index = 0
@@ -704,17 +717,29 @@ def _retrieve_fits_object(filename, **kwargs):
         for c in cols:
             for i in range(0, len(fits_cols)):
                 # .upper() is used because `fits` stores values in upper case
+<<<<<<< HEAD
                 hdr_keys = [h.upper() for h in list(hdulist[i+1].header.keys())]
 
                 # Longdouble case. Check for columns
                 if c+'_I' in fits_cols[i] or c+'_F' in fits_cols[i]:
                     if c not in list(data.keys()):
+=======
+                hdr_keys = [h.upper() for h in hdulist[i+1].header.keys()]
+
+                # Longdouble case. Check for columns
+                if c+'_I' in fits_cols[i] or c+'_F' in fits_cols[i]:
+                    if c not in data.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
                         data[c] = np.longdouble(hdulist[i+1].data[c+'_I'])
                         data[c] += np.longdouble(hdulist[i+1].data[c+'_F'])
 
                 # Longdouble case. Check for header keys
                 if c+'_I' in hdr_keys or c+'_F' in hdr_keys:
+<<<<<<< HEAD
                     if c not in list(data.keys()):
+=======
+                    if c not in data.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
                         data[c] = np.longdouble(hdulist[i+1].header[c+'_I'])
                         data[c] += np.longdouble(hdulist[i+1].header[c+'_F'])
 

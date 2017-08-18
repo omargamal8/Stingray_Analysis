@@ -3,10 +3,15 @@ from __future__ import (absolute_import, unicode_literals, division,
 import sys
 import collections
 import numbers
+<<<<<<< HEAD
+=======
+from six import string_types
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 import warnings
 import numpy as np
 
+<<<<<<< HEAD
 
 # If numba is installed, import jit. Otherwise, define an empty decorator with
 # the same name.
@@ -16,6 +21,34 @@ try:
 except:
     def jit(fun):
         return fun
+=======
+# If numba is installed, import jit. Otherwise, define an empty decorator with
+# the same name.
+
+HAS_NUMBA = False
+try:
+    from numba import jit
+
+    HAS_NUMBA = True
+except ImportError:
+    warnings.warn("Numba not installed. Faking it")
+
+
+    class jit(object):
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def __call__(self, func):
+            def wrapped_f(*args, **kwargs):
+                return func(*args, **kwargs)
+
+            return wrapped_f
+
+
+def _root_squared_mean(array):
+    return np.sqrt(np.sum(array ** 2)) / len(array)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 
 def simon(message, **kwargs):
@@ -36,7 +69,11 @@ def simon(message, **kwargs):
     warnings.warn("SIMON says: {0}".format(message), **kwargs)
 
 
+<<<<<<< HEAD
 def rebin_data(x, y, dx_new, yerr=None, method='sum'):
+=======
+def rebin_data(x, y, dx_new, yerr=None, method='sum', dx=None):
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     """Rebin some data to an arbitrary new data resolution. Either sum
     the data points in the new bins or average them.
 
@@ -48,16 +85,33 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
     y: iterable
         The independent variable to be binned
 
+<<<<<<< HEAD
     yerr: iterable, optional
         The uncertainties of y, to be propagated during binning.
 
     dx_new: float
         The new resolution of the dependent variable x
 
+=======
+    dx_new: float
+        The new resolution of the dependent variable x
+
+    Other parameters
+    ----------------
+    yerr: iterable, optional
+        The uncertainties of y, to be propagated during binning.
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     method: {"sum" | "average" | "mean"}, optional, default "sum"
         The method to be used in binning. Either sum the samples y in
         each new bin of x, or take the arithmetic mean.
 
+<<<<<<< HEAD
+=======
+    dx: float
+        The old resolution (otherwise, calculated from median diff)
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     Returns
     -------
@@ -74,10 +128,17 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
         The size of the binning step
     """
 
+<<<<<<< HEAD
     # y = np.asarray(y)
     # yerr = np.asarray(assign_value_if_none(yerr, np.zeros_like(y)))
 
     dx_old = x[1] - x[0]
+=======
+    y = np.asarray(y)
+    yerr = np.asarray(assign_value_if_none(yerr, np.zeros_like(y)))
+
+    dx_old = assign_value_if_none(dx, np.median(np.diff(x)))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     if dx_new < dx_old:
         raise ValueError("New frequency resolution must be larger than "
@@ -85,6 +146,7 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
 
     step_size = dx_new / dx_old
 
+<<<<<<< HEAD
 
     
     intervals = np.arange(0,y.shape[0], step_size)
@@ -121,6 +183,32 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
     from stingray.parallel import execute_parallel, _execute_sequential, post_concat_arrays
     output, outputerr = execute_parallel(wrapper, [post_concat_arrays, post_concat_arrays], intervals, jit = False)
     
+=======
+    output = []
+    outputerr = []
+    for i in np.arange(0, y.shape[0], step_size):
+        total = 0
+        totalerr = 0
+
+        int_i = int(i)
+        prev_frac = int_i + 1 - i
+        prev_bin = int_i
+        total += prev_frac * y[prev_bin]
+        totalerr += prev_frac * (yerr[prev_bin] ** 2)
+
+        if i + step_size < len(x):
+            # Fractional part of next bin:
+            next_frac = i + step_size - int(i + step_size)
+            next_bin = int(i + step_size)
+            total += next_frac * y[next_bin]
+            totalerr += next_frac * (yerr[next_bin] ** 2)
+
+        total += sum(y[int(i + 1):int(i + step_size)])
+        totalerr += sum(yerr[int(i + 1):int(step_size)] ** 2)
+        output.append(total)
+        outputerr.append(np.sqrt(totalerr))
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     output = np.asarray(output)
     outputerr = np.asarray(outputerr)
 
@@ -142,12 +230,96 @@ def rebin_data(x, y, dx_new, yerr=None, method='sum'):
         ybin = ybin[:-1]
         ybinerr = ybinerr[:-1]
 
+<<<<<<< HEAD
     new_x0 = (x[0] - (0.5*dx_old)) + (0.5*dx_new)
+=======
+    new_x0 = (x[0] - (0.5 * dx_old)) + (0.5 * dx_new)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     xbin = np.arange(ybin.shape[0]) * dx_new + new_x0
 
     return xbin, ybin, ybinerr, step_size
 
 
+<<<<<<< HEAD
+=======
+def rebin_data_log(x, y, f, y_err=None, dx=None):
+    """Logarithmic rebin of the periodogram.
+
+    The new frequency depends on the previous frequency modified by a factor f:
+
+    dnu_j = dnu_{j-1}*(1+f)
+
+    Parameters
+    ----------
+    x: iterable
+        The dependent variable with some resolution dx_old = x[1]-x[0]
+
+    y: iterable
+        The independent variable to be binned
+
+    f: float
+        The factor of increase of each bin wrt the previous one.
+
+    Other Parameters
+    ----------------
+    yerr: iterable, optional
+        The uncertainties of y, to be propagated during binning.
+
+    method: {"sum" | "average" | "mean"}, optional, default "sum"
+        The method to be used in binning. Either sum the samples y in
+        each new bin of x, or take the arithmetic mean.
+
+    dx: float, optional
+        The binning step of the initial xs
+
+    Returns
+    -------
+    xbin: numpy.ndarray
+        The midpoints of the new bins in x
+
+    ybin: numpy.ndarray
+        The binned quantity y
+
+    ybin_err: numpy.ndarray
+        The uncertainties of the binned values of y.
+
+    step_size: float
+        The size of the binning step
+    """
+    import scipy
+    dx_init = assign_value_if_none(dx, np.median(np.diff(x)))
+    y = np.asarray(y)
+    y_err = np.asarray(assign_value_if_none(y_err, np.zeros_like(y)))
+
+    minx = x[1] * 0.5  # frequency to start from
+    maxx = x[-1]  # maximum frequency to end
+    binx = [minx, minx + dx_init]  # first
+    dx = x[1]  # the frequency resolution of the first bin
+
+    # until we reach the maximum frequency, increase the width of each
+    # frequency bin by f
+    while binx[-1] <= maxx:
+        binx.append(binx[-1] + dx * (1.0 + f))
+        dx = binx[-1] - binx[-2]
+
+    # compute the mean of the ys that fall into each new frequency bin.
+    # we cast to np.double due to scipy's bad handling of longdoubles
+    biny, bin_edges, binno = scipy.stats.binned_statistic(
+        x.astype(np.double), y.astype(np.double),
+        statistic="mean", bins=binx)
+
+    biny_err, bin_edges, binno = scipy.stats.binned_statistic(
+        x.astype(np.double), y_err.astype(np.double),
+        statistic=_root_squared_mean, bins=binx)
+
+    # compute the number of powers in each frequency bin
+    nsamples = np.array([len(binno[np.where(binno == i)[0]])
+                         for i in range(np.max(binno))])
+
+    return binx, biny, biny_err, nsamples
+
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 def assign_value_if_none(value, default):
     return default if value is None else value
 
@@ -161,7 +333,11 @@ def is_string(s):  # pragma : no cover
 
     PY2 = sys.version_info[0] == 2
     if PY2:
+<<<<<<< HEAD
         return isinstance(s, str)  # NOQA
+=======
+        return isinstance(s, basestring)  # NOQA
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     else:
         return isinstance(s, str)  # NOQA
 
@@ -175,7 +351,11 @@ def is_iterable(stuff):
 def order_list_of_arrays(data, order):
     if hasattr(data, 'items'):
         data = dict([(key, value[order])
+<<<<<<< HEAD
                      for key, value in list(data.items())])
+=======
+                     for key, value in data.items()])
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     elif is_iterable(data):
         data = [i[order] for i in data]
     else:
@@ -238,7 +418,11 @@ def is_int(obj):
     return isinstance(obj, (numbers.Integral, np.integer))
 
 
+<<<<<<< HEAD
 def get_random_state(random_state = None):
+=======
+def get_random_state(random_state=None):
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     if not random_state:
         random_state = np.random.mtrand._rand
     else:
@@ -246,7 +430,11 @@ def get_random_state(random_state = None):
             random_state = np.random.RandomState(random_state)
         elif not isinstance(random_state, np.random.RandomState):
             raise ValueError("{value} can't be used to generate a numpy.random.RandomState".format(
+<<<<<<< HEAD
                 value = random_state
+=======
+                value=random_state
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             ))
 
     return random_state
@@ -259,7 +447,11 @@ def baseline_als(y, lam, p, niter=10):
     https://www.researchgate.net/publication/228961729_Technical_Report_Baseline_Correction_with_Asymmetric_Least_Squares_Smoothing
     The Python translation is partly from
     http://stackoverflow.com/questions/29156532/python-baseline-correction-library
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     Parameters
     ----------
     y : array of floats
@@ -278,8 +470,13 @@ def baseline_als(y, lam, p, niter=10):
     for i in range(niter):
         W = sparse.spdiags(w, 0, L, L)
         Z = W + lam * D.dot(D.transpose())
+<<<<<<< HEAD
         z = sparse.linalg.spsolve(Z, w*y)
         w = p * (y > z) + (1-p) * (y < z)
+=======
+        z = sparse.linalg.spsolve(Z, w * y)
+        w = p * (y > z) + (1 - p) * (y < z)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     return z
 
 
@@ -304,9 +501,15 @@ def excess_variance(lc, normalization='fvar'):
     lc_actual_var = np.var(lc.counts)
     var_xs = lc_actual_var - lc_mean_var
     mean_lc = np.mean(lc.counts)
+<<<<<<< HEAD
     mean_ctvar = np.mean(mean_lc ** 2)
 
     fvar = var_xs / mean_ctvar
+=======
+    mean_ctvar = mean_lc ** 2
+
+    fvar = np.sqrt(var_xs / mean_ctvar)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     N = len(lc.counts)
     var_xs_err_A = np.sqrt(2 / N) * lc_mean_var / mean_lc ** 2
@@ -320,3 +523,98 @@ def excess_variance(lc, normalization='fvar'):
     elif normalization == 'none' or normalization is None:
         return var_xs, var_xs_err
 
+<<<<<<< HEAD
+=======
+
+def create_window(N, window_type='uniform'):
+    """ A method to create window functions commonly used in signal processing.
+        Windows supported are:
+        Hamming, Hanning, uniform(rectangular window), triangular window, blackmann window among others.
+
+        Parameters
+        ----------
+        N : int
+            Total number of data points in window. If negative, abs is taken.
+        window_type : {'uniform', 'parzen', 'hamming', 'hanning', 'traingular', 'welch', 'blackmann', 'flat-top'}, optional, default 'uniform'
+            Type of window to create.
+         Returns
+        -------
+        window: numpy.ndarray
+            Window function of length N.
+    """
+
+    if not isinstance(N, int):
+        raise TypeError('N (window length) must be an integer')
+
+    WINDOWS = ['uniform', 'parzen', 'hamming', 'hanning', 'triangular', 'welch', 'blackmann', 'flat-top']
+
+    if not isinstance(window_type, string_types):
+        raise TypeError('type of window must be specified as string!')
+
+    window_type = window_type.lower()
+    if window_type not in WINDOWS:
+        raise ValueError("Wrong window type specified or window function is not available")
+
+    # Return empty array as window if N = 0
+    if N == 0:
+        return np.array([])
+
+    window = None
+    N = abs(N)
+
+    # Window samples index
+    n = np.arange(N)
+
+    # Constants
+    N_minus_1 = N - 1
+    N_by_2 = np.int((np.floor((N_minus_1) / 2)))
+
+    # Create Windows
+    if window_type == 'uniform':
+        window = np.ones(N)
+
+    if window_type == 'parzen':
+        N_parzen = np.int(np.ceil((N + 1) / 2))
+        N2_plus_1 = np.int(np.floor((N_parzen / 2))) + 1
+
+        window = np.zeros(N_parzen)
+        windlag0 = np.arange(0, N2_plus_1) / (N_parzen - 1)
+        windlag1 = 1 - np.arange(N2_plus_1, N_parzen) / (N_parzen - 1)
+        window[:N2_plus_1] = 1 - (1 - windlag0) * windlag0 * windlag0 * 6
+        window[N2_plus_1:] = windlag1 * windlag1 * windlag1 * 2
+        lagindex = np.arange(N_parzen - 1, 0, -1)
+        window = np.concatenate((window[lagindex], window))
+        window = window[:N]
+
+    if window_type == 'hamming':
+        window = 0.54 - 0.46 * np.cos((2 * np.pi * n) / N_minus_1)
+
+    if window_type == 'hanning':
+        window = 0.5 * (1 - np.cos(2 * np.pi * n / N_minus_1))
+
+    if window_type == 'triangular':
+        window = 1 - np.abs((n - (N_by_2)) / N)
+
+    if window_type == 'welch':
+        N_minus_1_by_2 = N_minus_1 / 2
+        window = 1 - np.square((n - N_minus_1_by_2) / N_minus_1_by_2)
+        
+    if window_type == 'blackmann':
+        a0 = 0.42659
+        a1 = 0.49656
+        a2 = 0.076849
+        window = a0 - a1 * np.cos((2 * np.pi * n) / N_minus_1) + a2 * np.cos((4 * np.pi * n) / N_minus_1)
+
+    if window_type == 'flat-top':
+        a0 = 1
+        a1 = 1.93
+        a2 = 1.29
+        a3 = 0.388
+        a4 = 0.028
+        window = a0 - a1 * np.cos((2 * np.pi * n) / N_minus_1) + \
+                 a2 * np.cos((4 * np.pi * n) / N_minus_1) - \
+                 a3 * np.cos((6 * np.pi * n) / N_minus_1) + \
+                 a4 * np.cos((8 * np.pi * n) / N_minus_1)
+
+    return window
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2

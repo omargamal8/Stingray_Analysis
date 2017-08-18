@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 
+=======
+from __future__ import division
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import collections
 import numpy as np
 
@@ -176,7 +180,11 @@ class Covariancespectrum(object):
         # Add time of arrivals to corresponding energy bins
         # For each bin except the last one, the lower bound is included and
         # the upper bound is excluded.
+<<<<<<< HEAD
         for energy in list(energy_events.keys()):
+=======
+        for energy in energy_events.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             # The last energy bin
             if energy == self.max_energy - least_count*0.5:
                 toa = event_list_T[0][np.logical_and(
@@ -214,7 +222,11 @@ class Covariancespectrum(object):
         """
         # Initialize it with empty mapping
         if self.band_interest is None:
+<<<<<<< HEAD
             for key in list(energy_events.keys()):
+=======
+            for key in energy_events.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
                 energy_covar[key] = []
         else:
             for band in list(self.band_interest):
@@ -233,7 +245,11 @@ class Covariancespectrum(object):
         if not self.avg_covar:
             xs_var = dict()
 
+<<<<<<< HEAD
         for energy in list(energy_covar.keys()):
+=======
+        for energy in energy_covar.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             lc, lc_ref = self._create_lc_and_lc_ref(energy, energy_events)
 
             covar = self._compute_covariance(lc, lc_ref)
@@ -246,7 +262,11 @@ class Covariancespectrum(object):
             # Excess variance in ref band
             xs_var[energy] = self._calculate_excess_variance(lc_ref)
 
+<<<<<<< HEAD
         for key, value in list(energy_covar.items()):
+=======
+        for key, value in energy_covar.items():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             if not xs_var[key] > 0:
                 utils.simon("The excess variance in the reference band is "
                             "negative. This implies that the reference "
@@ -254,12 +274,21 @@ class Covariancespectrum(object):
                             "covariance spectra will have NaNs!")
 
         if not self.avg_covar:
+<<<<<<< HEAD
             self.unnorm_covar = np.vstack(list(energy_covar.items()))
             energy_covar[key] = value / (xs_var[key])**0.5
 
             self.covar = np.vstack(list(energy_covar.items()))
 
             self.covar_error = np.vstack(list(self.covar_error.items()))
+=======
+            self.unnorm_covar = np.vstack(energy_covar.items())
+            energy_covar[key] = value / (xs_var[key])**0.5
+
+            self.covar = np.vstack(energy_covar.items())
+
+            self.covar_error = np.vstack(self.covar_error.items())
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def _create_lc_and_lc_ref(self, energy, energy_events):
         lc = Lightcurve.make_lightcurve(
@@ -268,7 +297,11 @@ class Covariancespectrum(object):
 
         # Calculating timestamps for lc_ref
         toa_ref = []
+<<<<<<< HEAD
         for key, value in list(energy_events.items()):
+=======
+        for key, value in energy_events.items():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             if key >= self.ref_band_interest[0] and \
                     key <= self.ref_band_interest[1]:
                 if key != energy:
@@ -450,12 +483,17 @@ class AveragedCovariancespectrum(Covariancespectrum):
                 self.energy_covar = energy_covar
                 self.xs_var = xs_var
             else:  # Sum up
+<<<<<<< HEAD
                 for key in list(energy_covar.keys()):
+=======
+                for key in energy_covar.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
                     self.energy_covar[key] = self.energy_covar.get(key, 0) + \
                                              energy_covar[key]
                     self.xs_var[key] = self.xs_var.get(key, 0) + xs_var[key]
 
         # Now divide with total number of bins for averaging
+<<<<<<< HEAD
         for key in list(self.energy_covar.keys()):
             self.energy_covar[key] /= self.nbins
             self.xs_var[key] /= self.nbins
@@ -466,6 +504,18 @@ class AveragedCovariancespectrum(Covariancespectrum):
             self.energy_covar[key] = value / (self.xs_var[key])**0.5
 
         self.covar = np.vstack(list(self.energy_covar.items()))
+=======
+        for key in self.energy_covar.keys():
+            self.energy_covar[key] /= self.nbins
+            self.xs_var[key] /= self.nbins
+
+        self.unnorm_covar = np.vstack(self.energy_covar.items())
+
+        for key, value in self.energy_covar.items():
+            self.energy_covar[key] = value / (self.xs_var[key])**0.5
+
+        self.covar = np.vstack(self.energy_covar.items())
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def _init_covar_error(self):
         """Initialize dictionaries separately for the calculation of error."""
@@ -484,7 +534,11 @@ class AveragedCovariancespectrum(Covariancespectrum):
         http://arxiv.org/pdf/1405.6575v2.pdf Equation 15
 
         """
+<<<<<<< HEAD
         for energy in list(self.covar_error.keys()):
+=======
+        for energy in self.covar_error.keys():
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             lc, lc_ref = self._create_lc_and_lc_ref(energy, self.energy_events)
 
             xs_y = self._calculate_excess_variance(lc_ref)

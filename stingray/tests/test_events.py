@@ -23,7 +23,13 @@ class TestEvents(object):
     def setup_class(self):
         self.time = [0.5, 1.5, 2.5, 3.5]
         self.counts = [3000, 2000, 2200, 3600]
+<<<<<<< HEAD
         self.spectrum = [[1, 2, 3, 4, 5, 6],[1000, 2040, 1000, 3000, 4020, 2070]]
+=======
+        self.counts_flat = [3000, 3000, 3000, 3000]
+        self.spectrum = [[1, 2, 3, 4, 5, 6],
+                         [1000, 2040, 1000, 3000, 4020, 2070]]
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         self.gti = [[0, 4]]
 
     def test_inequal_length(self):
@@ -37,7 +43,11 @@ class TestEvents(object):
         """Create a light curve from event list."""
         ev = EventList(self.time, gti=self.gti)
         lc = ev.to_lc(1)
+<<<<<<< HEAD
         print((lc.time))
+=======
+        print(lc.time)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         assert (lc.time == [0.5, 1.5, 2.5, 3.5]).all()
         assert (lc.gti == self.gti).all()
 
@@ -52,14 +62,23 @@ class TestEvents(object):
         """Simulate photon arrival times for an event list 
         from light curve.
         """
+<<<<<<< HEAD
         lc = Lightcurve(self.time, self.counts)
         ev = EventList()
         ev.simulate_times(lc)
+=======
+        lc = Lightcurve(self.time, self.counts_flat, gti=self.gti)
+        ev = EventList()
+        ev.simulate_times(lc)
+        lc_sim = ev.to_lc(dt=lc.dt, tstart=lc.tstart, tseg=lc.tseg)
+        assert np.all((lc - lc_sim).counts < 3 * np.sqrt(lc.counts))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_simulate_times_with_spline(self):
         """Simulate photon arrival times, with use_spline option
         enabled.
         """
+<<<<<<< HEAD
         lc = Lightcurve(self.time, self.counts)
         ev = EventList()
         ev.simulate_times(lc, use_spline = True)
@@ -74,6 +93,13 @@ class TestEvents(object):
 
         lc_rcd = ev.to_lc(dt=1, tstart=0, tseg=4)
         assert np.all(np.abs(lc_rcd.counts - lc.counts) < 3 * np.sqrt(lc.counts))
+=======
+        lc = Lightcurve(self.time, self.counts_flat, gti=self.gti)
+        ev = EventList()
+        ev.simulate_times(lc, use_spline=True)
+        lc_sim = ev.to_lc(dt=lc.dt, tstart=lc.tstart, tseg=lc.tseg)
+        assert np.all((lc - lc_sim).counts < 3 * np.sqrt(lc.counts))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_simulate_energies(self):
         """Assign photon energies to an event list.

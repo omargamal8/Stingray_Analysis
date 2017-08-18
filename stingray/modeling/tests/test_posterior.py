@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+from __future__ import division, print_function
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import numpy as np
 import scipy.stats
 import copy
@@ -8,7 +12,13 @@ from astropy.modeling import models
 from scipy.special import gammaln as scipy_gammaln
 
 from stingray import Lightcurve, Powerspectrum
+<<<<<<< HEAD
 from stingray.modeling import Posterior, PSDPosterior, PoissonPosterior, GaussianPosterior
+=======
+from stingray.modeling import Posterior, PSDPosterior, \
+    PoissonPosterior, GaussianPosterior, LaplacePosterior
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 from stingray.modeling import set_logprior
 from stingray.modeling.posterior import logmin
 from stingray.modeling.posterior import IncorrectParameterError
@@ -49,7 +59,11 @@ class TestSetPrior(object):
         pl = models.PowerLaw1D()
         pl.x_0.fixed = True
 
+<<<<<<< HEAD
         cls.lpost = PSDPosterior(cls.ps, pl)
+=======
+        cls.lpost = PSDPosterior(cls.ps.freq, cls.ps.power, pl, m=cls.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def test_set_prior_runs(self):
         p_alpha = lambda alpha: ((-1. <= alpha) & (alpha <= 5.))/6.0
@@ -152,20 +166,35 @@ class TestPSDPosterior(object):
         cls.priors = {"amplitude":p_amplitude}
 
     def test_logprior_fails_without_prior(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power, self.model,
+                             m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         with pytest.raises(AttributeError):
             lpost.logprior([1])
 
     def test_making_posterior(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         assert lpost.x.all() == self.ps.freq.all()
         assert lpost.y.all() == self.ps.power.all()
 
     def test_correct_number_of_parameters(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         with pytest.raises(IncorrectParameterError):
@@ -174,7 +203,12 @@ class TestPSDPosterior(object):
     def test_logprior(self):
         t0 = [2.0]
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         lp_test = lpost.logprior(t0)
@@ -188,7 +222,12 @@ class TestPSDPosterior(object):
 
         loglike = -np.sum(np.log(mean_model)) - np.sum(self.ps.power/mean_model)
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         loglike_test = lpost.loglikelihood(t0, neg=False)
@@ -201,7 +240,12 @@ class TestPSDPosterior(object):
         m = self.model(self.ps.freq[1:], t0)
         loglike = np.sum(self.ps.power[1:]/m + np.log(m))
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         loglike_test = lpost.loglikelihood(t0, neg=True)
@@ -211,7 +255,12 @@ class TestPSDPosterior(object):
     def test_posterior(self):
         t0 = [2.0]
         m = self.model(self.ps.freq[1:], t0)
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         post_test = lpost(t0, neg=False)
@@ -225,7 +274,12 @@ class TestPSDPosterior(object):
     def test_negative_posterior(self):
         t0 = [2.0]
         m = self.model(self.ps.freq[1:], t0)
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         post_test = lpost(t0, neg=True)
@@ -486,6 +540,139 @@ class TestGaussianPosterior(object):
 
         assert np.isclose(lpost(t0), logmin, 1e-5)
 
+<<<<<<< HEAD
+=======
+class TestLaplacePosterior(object):
+
+    @classmethod
+    def setup_class(cls):
+
+        nx = 1000000
+        cls.x = np.arange(nx)
+        cls.countrate = 10.0
+        cls.cerr = 2.0
+        cls.y = np.random.normal(cls.countrate, cls.cerr, size=cls.x.shape[0])
+        cls.yerr = np.ones_like(cls.y)*cls.cerr
+
+        cls.model = models.Const1D()
+
+        p_amplitude = lambda amplitude: \
+            scipy.stats.norm(loc=cls.countrate, scale=cls.cerr).pdf(amplitude)
+
+        cls.priors = {"amplitude":p_amplitude}
+
+    def test_logprior_fails_without_prior(self):
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+
+        with pytest.raises(AttributeError):
+            lpost.logprior([10])
+
+    def test_making_posterior(self):
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        assert lpost.x.all() == self.x.all()
+        assert lpost.y.all() == self.y.all()
+
+    def test_correct_number_of_parameters(self):
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        with pytest.raises(IncorrectParameterError):
+            lpost([2,3])
+
+    def test_logprior(self):
+        t0 = [10.0]
+
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        lp_test = lpost.logprior(t0)
+        lp = np.log(scipy.stats.norm(self.countrate, self.cerr).pdf(t0))
+        assert lp == lp_test
+
+    def test_loglikelihood(self):
+        t0 = [10.0]
+        self.model.amplitude = t0[0]
+        mean_model = self.model(self.x)
+
+        loglike = np.sum(-np.log(2.0*self.yerr) -
+                         np.abs(self.y - mean_model)/self.yerr)
+
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        loglike_test = lpost.loglikelihood(t0, neg=False)
+
+        assert np.isclose(loglike, loglike_test)
+
+
+    def test_negative_loglikelihood(self):
+        t0 = [10.0]
+        self.model.amplitude = t0[0]
+        mean_model = self.model(self.x)
+
+        loglike = -np.sum(-np.log(2.0*self.yerr) -
+                         np.abs(self.y - mean_model)/self.yerr)
+
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        loglike_test = lpost.loglikelihood(t0, neg=True)
+
+        assert np.isclose(loglike, loglike_test)
+
+    def test_posterior(self):
+        t0 = [10.0]
+        self.model.amplitude = t0[0]
+        mean_model = self.model(self.x)
+
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        post_test = lpost(t0, neg=False)
+
+        loglike = np.sum(-np.log(2.0*self.yerr) -
+                         np.abs(self.y - mean_model)/self.yerr)
+
+        logprior = np.log(scipy.stats.norm(self.countrate, self.cerr).pdf(t0))
+
+        post = loglike + logprior
+
+        assert np.isclose(post_test, post, atol=1.e-10)
+
+    def test_negative_posterior(self):
+        t0 = [10.0]
+        self.model.amplitude = t0[0]
+        mean_model = self.model(self.x)
+
+        lpost = LaplacePosterior(self.x, self.y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        post_test = lpost(t0, neg=True)
+
+        loglike = np.sum(-np.log(2.0*self.yerr) -
+                         np.abs(self.y - mean_model)/self.yerr)
+
+        logprior = np.log(scipy.stats.norm(self.countrate, self.cerr).pdf(t0))
+
+        post = -loglike - logprior
+
+        assert np.isclose(post_test, post, atol=1.e-10)
+
+    def test_counts_are_nan(self):
+        y = np.nan * np.ones(self.x.shape[0])
+
+        t0 = [10.0]
+        self.model.amplitude = t0[0]
+
+        lpost = LaplacePosterior(self.x, y, self.yerr, self.model)
+        lpost.logprior = set_logprior(lpost, self.priors)
+
+        assert np.isclose(lpost(t0), logmin, 1e-5)
+
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 
 class TestPerPosteriorAveragedPeriodogram(object):
@@ -518,20 +705,35 @@ class TestPerPosteriorAveragedPeriodogram(object):
         cls.priors = {"amplitude":p_amplitude}
 
     def test_logprior_fails_without_prior(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         with pytest.raises(AttributeError):
             lpost.logprior([1])
 
     def test_making_posterior(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         assert lpost.x.all() == self.ps.freq.all()
         assert lpost.y.all() == self.ps.power.all()
 
     def test_correct_number_of_parameters(self):
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         with pytest.raises(IncorrectParameterError):
@@ -540,7 +742,12 @@ class TestPerPosteriorAveragedPeriodogram(object):
     def test_logprior(self):
         t0 = [2.0]
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         lp_test = lpost.logprior(t0)
@@ -557,7 +764,12 @@ class TestPerPosteriorAveragedPeriodogram(object):
                                np.sum((2.0 / (2. * self.m) - 1.0) *
                                       np.log(self.ps.power)))
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         loglike_test = lpost.loglikelihood(t0, neg=False)
@@ -577,7 +789,12 @@ class TestPerPosteriorAveragedPeriodogram(object):
                                       np.log(self.ps.power)))
 
 
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         loglike_test = lpost.loglikelihood(t0, neg=True)
@@ -589,7 +806,12 @@ class TestPerPosteriorAveragedPeriodogram(object):
         self.model.amplitude = t0[0]
 
         mean_model = self.model(self.ps.freq)
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         post_test = lpost(t0, neg=False)
@@ -609,7 +831,12 @@ class TestPerPosteriorAveragedPeriodogram(object):
         self.model.amplitude = t0[0]
 
         mean_model = self.model(self.ps.freq)
+<<<<<<< HEAD
         lpost = PSDPosterior(self.ps, self.model)
+=======
+        lpost = PSDPosterior(self.ps.freq, self.ps.power,
+                             self.model, m=self.ps.m)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         post_test = lpost(t0, neg=True)
@@ -632,7 +859,11 @@ class TestPerPosteriorAveragedPeriodogram(object):
 
         t0 = [2.0]
         m = self.model(self.ps.freq[1:], t0)
+<<<<<<< HEAD
         lpost = PSDPosterior(ps_nan, self.model)
+=======
+        lpost = PSDPosterior(ps_nan.freq, ps_nan.power, self.model)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         lpost.logprior = set_logprior(lpost, self.priors)
 
         assert np.isclose(lpost(t0), logmin, 1e-5)

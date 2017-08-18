@@ -3,17 +3,28 @@ Definition of :class:`EventList`.
 
 :class:`EventList` is used to handle photon arrival times.
 """
+<<<<<<< HEAD
 
+=======
+from __future__ import absolute_import, division, print_function
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 from .io import read, write
 from .utils import simon, assign_value_if_none
 from .gti import cross_gtis, append_gtis, check_separate
 
 from .lightcurve import Lightcurve
+<<<<<<< HEAD
 
 import numpy as np
 import numpy.random as ra
 import scipy.interpolate as sci
+=======
+from stingray.simulator.base import simulate_times
+
+import numpy as np
+import numpy.random as ra
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 __all__ = ['EventList']
 
@@ -150,12 +161,18 @@ class EventList(object):
 
     def simulate_times(self, lc, use_spline=False, bin_time=None):
         """
+<<<<<<< HEAD
         Assign (simulate) photon arrival times to event list, using acceptance-rejection
         method.
+=======
+        Assign (simulate) photon arrival times to event list, using the
+        acceptance-rejection method.
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         Parameters
         ----------
         lc: `Lightcurve` object
+<<<<<<< HEAD
         """ 
        
         times = lc.time
@@ -234,6 +251,26 @@ class EventList(object):
         self.time = EventList(time).time
         self.ncounts = len(self.time)
         self.gti = lc.gti
+=======
+
+        Other Parameters
+        ----------------
+        use_spline : bool
+            Approximate the light curve with a spline to avoid binning effects
+        bin_time : float
+            The bin time of the light curve, if it needs to be specified for
+            improved precision
+
+        Return
+        ------
+        times : array-like
+            Simulated photon arrival times
+        """
+        self.time = simulate_times(lc, use_spline=use_spline,
+                                   bin_time=bin_time)
+        self.gti = lc.gti
+        self.ncounts = len(self.time)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def simulate_energies(self, spectrum):
         """
@@ -392,7 +429,11 @@ class EventList(object):
             return EventList(time=time)
         
         elif format_ == 'hdf5' or format_ == 'fits':
+<<<<<<< HEAD
             keys = list(data.keys())
+=======
+            keys = data.keys()
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
             values = []
             
             if format_ == 'fits':

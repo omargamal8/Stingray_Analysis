@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+from __future__ import division, print_function
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import numpy as np
 
 from astropy.modeling import models
@@ -78,9 +82,20 @@ class TestFitLorentzians(object):
         model.amplitude_0 = self.t0[0]
         # model.bounds = {}
 
+<<<<<<< HEAD
         parest, res = fit_powerspectrum(self.ps, model,
                                 np.random.normal(self.t0,
                                                  self.t0 / 10))
+=======
+        t0 = np.array([self.amplitude_0, self.x_0_0, self.fwhm_0,
+              self.amplitude_1, self.fwhm_1,
+              self.amplitude_2, self.fwhm_2,
+              self.whitenoise])
+
+        parest, res = fit_powerspectrum(self.ps, model,
+                                np.random.normal(t0,
+                                                 t0 / 10))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         true_pars = [self.amplitude_0,
                      self.x_0_0, self.fwhm_0,
@@ -97,9 +112,21 @@ class TestFitLorentzians(object):
         model.amplitude_0.fixed = True
         # model.bounds = {}
 
+<<<<<<< HEAD
         parest, res = fit_powerspectrum(self.ps, model,
                                   np.random.normal(self.t0,
                                                    self.t0 / 10))
+=======
+        t0 = np.array([self.x_0_0, self.fwhm_0,
+              self.amplitude_1, self.x_0_1, self.fwhm_1,
+              self.amplitude_2, self.x_0_2, self.fwhm_2,
+              self.whitenoise])
+
+
+        parest, res = fit_powerspectrum(self.ps, model,
+                                  np.random.normal(t0,
+                                                   t0 / 10))
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         true_pars = [self.x_0_0, self.fwhm_0,
                      self.amplitude_1, self.x_0_1, self.fwhm_1,

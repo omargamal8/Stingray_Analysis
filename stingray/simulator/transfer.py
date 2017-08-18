@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+from __future__ import division, print_function, absolute_import
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import numpy as np
 
 from stingray.io import read, write

@@ -345,7 +345,11 @@ def get_btis(gtis, start_time=None, stop_time=None):
         btis = [[gtis[0][0] - start_time]]
     # Transform GTI list in
     flat_gtis = gtis.flatten()
+<<<<<<< HEAD
     new_flat_btis = list(zip(flat_gtis[1:-2:2], flat_gtis[2:-1:2]))
+=======
+    new_flat_btis = zip(flat_gtis[1:-2:2], flat_gtis[2:-1:2])
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     btis.extend(new_flat_btis)
 
     if stop_time - gtis[-1][1] > 0:
@@ -501,7 +505,12 @@ def join_gtis(gti0, gti1):
     return np.sort(final_gti, axis=0)
 
 
+<<<<<<< HEAD
 def time_intervals_from_gtis(gtis, chunk_length):
+=======
+def time_intervals_from_gtis(gtis, chunk_length, fraction_step=1,
+                             epsilon=1e-5):
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     """Returns equal time intervals compatible with GTIs.
 
     Used to start each FFT/PDS/cospectrum from the start of a GTI,
@@ -513,7 +522,14 @@ def time_intervals_from_gtis(gtis, chunk_length):
         [[gti0_0, gti0_1], [gti1_0, gti1_1], ...]
     chunk_length : float
         Length of the chunks
+<<<<<<< HEAD
 
+=======
+    fraction_step : float
+        If the step is not a full chunk_length but less (e.g. a moving window),
+        this indicates the ratio between step step and `chunk_length` (e.g.
+        0.5 means that the window shifts of half chunk_length)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     Returns
     -------
     spectrum_start_times : array-like
@@ -525,11 +541,19 @@ def time_intervals_from_gtis(gtis, chunk_length):
     """
     spectrum_start_times = np.array([], dtype=np.longdouble)
     for g in gtis:
+<<<<<<< HEAD
         if g[1] - g[0] < chunk_length:
             continue
 
         newtimes = np.arange(g[0], g[1] - chunk_length,
                              np.longdouble(chunk_length),
+=======
+        if g[1] - g[0] + epsilon < chunk_length:
+            continue
+
+        newtimes = np.arange(g[0], g[1] - chunk_length + epsilon,
+                             np.longdouble(chunk_length) * fraction_step,
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
                              dtype=np.longdouble)
         spectrum_start_times = \
             np.append(spectrum_start_times,
@@ -540,7 +564,12 @@ def time_intervals_from_gtis(gtis, chunk_length):
     return spectrum_start_times, spectrum_start_times + chunk_length
 
 
+<<<<<<< HEAD
 def bin_intervals_from_gtis(gtis, chunk_length, time, dt=None, epsilon=0.001):
+=======
+def bin_intervals_from_gtis(gtis, chunk_length, time, dt=None, fraction_step=1,
+                            epsilon=0.001):
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     """Similar to intervals_from_gtis, but given an input time array.
 
     Used to start each FFT/PDS/cospectrum from the start of a GTI,
@@ -564,6 +593,13 @@ def bin_intervals_from_gtis(gtis, chunk_length, time, dt=None, epsilon=0.001):
         Time resolution of the light curve.
     epsilon : float, default 0.001
         The tolerance, in fraction of dt, for the comparisons at the borders
+<<<<<<< HEAD
+=======
+    fraction_step : float
+        If the step is not a full chunk_length but less (e.g. a moving window),
+        this indicates the ratio between step step and `chunk_length` (e.g.
+        0.5 means that the window shifts of half chunk_length)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     Examples
     --------
@@ -621,8 +657,13 @@ def bin_intervals_from_gtis(gtis, chunk_length, time, dt=None, epsilon=0.001):
         if time[stopbin - 1] > g[1] - dt/2 + epsilon*dt:
             stopbin -= 1
 
+<<<<<<< HEAD
         newbins = np.arange(startbin, stopbin - nbin + 1, nbin,
                             dtype=np.long)
+=======
+        newbins = np.arange(startbin, stopbin - nbin + 1,
+                            int(nbin * fraction_step), dtype=np.long)
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
         spectrum_start_bins = \
             np.append(spectrum_start_bins,
                       newbins)

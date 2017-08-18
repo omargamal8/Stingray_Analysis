@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+from __future__ import division
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 import numpy as np
 from astropy.modeling import models
 
@@ -99,7 +103,11 @@ def fit_powerspectrum(ps, model, starting_pars, max_post=False, priors=None,
     Now we have to guess starting parameters. For each Lorentzian, we have
     amplitude, centroid position and fwhm, and this pattern repeats for each
     Lorentzian in the fit. The white noise level is the last parameter.
+<<<<<<< HEAD
     >>> t0 = [80, 1., 1.5, 2.5]
+=======
+    >>> t0 = [80, 1.5, 2.5]
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     Let's also make a model to test:
     >>> model_to_test = models.PowerLaw1D() + models.Const1D()
@@ -114,10 +122,19 @@ def fit_powerspectrum(ps, model, starting_pars, max_post=False, priors=None,
 
     """
     if priors:
+<<<<<<< HEAD
         lpost = PSDPosterior(ps, model, priors=priors)
     else:
         lpost = PSDLogLikelihood(ps.freq, ps.power, model, m=ps.m)
 
+=======
+        lpost = PSDPosterior(ps.freq, ps.power, model, priors=priors,
+                             m=ps.m)
+    else:
+        lpost = PSDLogLikelihood(ps.freq, ps.power, model, m=ps.m)
+
+
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
     parest = PSDParEst(ps, fitmethod=fitmethod, max_post=max_post)
     res = parest.fit(lpost, starting_pars, neg=True)
 
@@ -242,4 +259,7 @@ def fit_lorentzians(ps, nlor, starting_pars, fit_whitenoise=True,
 
     return fit_powerspectrum(ps, model, starting_pars, max_post=max_post,
                              priors=priors, fitmethod=fitmethod)
+<<<<<<< HEAD
 
+=======
+>>>>>>> cbe87c34664519d992317792703ccec5492528f2
