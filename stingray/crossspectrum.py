@@ -6,7 +6,6 @@ import scipy.stats
 import scipy.fftpack
 import scipy.optimize
 
-<<<<<<< HEAD
 
 from stingray.parallel import post_concat_arrays, execute_parallel
 from stingray.lightcurve import Lightcurve
@@ -14,24 +13,14 @@ from stingray.utils import rebin_data, simon
 from stingray.exceptions import StingrayError
 from stingray.gti import cross_two_gtis, bin_intervals_from_gtis, check_gtis
 
-=======
-from stingray.lightcurve import Lightcurve
-from stingray.utils import rebin_data, simon, rebin_data_log
-from stingray.exceptions import StingrayError
-from stingray.gti import cross_two_gtis, bin_intervals_from_gtis, check_gtis
-import copy
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
 __all__ = ["Crossspectrum", "AveragedCrossspectrum", "coherence"]
 
 
-<<<<<<< HEAD
 def _root_squared_mean(array):
     return np.sqrt(np.sum(array**2)) / len(array)
 
 
-=======
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 def coherence(lc1, lc2):
     """
     Estimate coherence function of two light curves.
@@ -149,16 +138,6 @@ class Crossspectrum(object):
         self.lc2 = lc2
 
         self._make_crossspectrum(lc1, lc2)
-<<<<<<< HEAD
-=======
-        # These are needed to calculate coherence
-        self._make_auxil_pds(lc1, lc2)
-
-    def _make_auxil_pds(self, lc1, lc2):
-        if lc1 is not lc2 and isinstance(lc1, Lightcurve):
-            self.pds1 = Crossspectrum(lc1, lc1, norm='none')
-            self.pds2 = Crossspectrum(lc2, lc2, norm='none')
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def _make_crossspectrum(self, lc1, lc2):
 
@@ -278,11 +257,7 @@ class Crossspectrum(object):
 
         return freqs[freqs > 0], cross
 
-<<<<<<< HEAD
     def rebin(self, df, method="mean"):
-=======
-    def rebin(self, df=None, f=None, method="mean"):
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
         """
         Rebin the cross spectrum to a new frequency resolution df.
 
@@ -291,21 +266,12 @@ class Crossspectrum(object):
         df: float
             The new frequency resolution
 
-<<<<<<< HEAD
-=======
-        Other Parameters
-        ----------------
-        f: float
-            the rebin factor. If specified, it substitutes df with f*self.df
-
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
         Returns
         -------
         bin_cs = Crossspectrum object
             The newly binned cross spectrum
         """
 
-<<<<<<< HEAD
         # rebin cross spectrum to new resolution
         binfreq, bincs, binerr, step_size = \
             rebin_data(self.freq, self.power, df, self.power_err,
@@ -314,22 +280,6 @@ class Crossspectrum(object):
         # make an empty cross spectrum object
         # note: syntax deliberate to work with subclass Powerspectrum
         bin_cs = self.__class__()
-=======
-        if f is None and df is None:
-            raise ValueError('You need to specify at least one between f and '
-                             'df')
-        elif f is not None:
-            df = f * self.df
-
-        # rebin cross spectrum to new resolution
-        binfreq, bincs, binerr, step_size = \
-            rebin_data(self.freq, self.power, df, self.power_err,
-                       method=method, dx=self.df)
-
-        # make an empty cross spectrum object
-        # note: syntax deliberate to work with subclass Powerspectrum
-        bin_cs = copy.copy(self)
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         # store the binned periodogram in the new object
         bin_cs.freq = binfreq
@@ -340,26 +290,6 @@ class Crossspectrum(object):
         bin_cs.nphots1 = self.nphots1
         bin_cs.power_err = binerr
 
-<<<<<<< HEAD
-=======
-        if hasattr(self, 'unnorm_power'):
-            _, binpower_unnorm, _, _ = \
-                rebin_data(self.freq, self.unnorm_power, df,
-                           method=method, dx=self.df)
-
-            bin_cs.unnorm_power = binpower_unnorm
-
-        if hasattr(self, 'cs_all'):
-            cs_all = []
-            for c in self.cs_all:
-                cs_all.append(c.rebin(df=df, f=f, method=method))
-            bin_cs.cs_all = cs_all
-        if hasattr(self, 'pds1'):
-            bin_cs.pds1 = self.pds1.rebin(df=df, f=f, method=method)
-        if hasattr(self, 'pds2'):
-            bin_cs.pds2 = self.pds2.rebin(df=df, f=f, method=method)
-
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
         try:
             bin_cs.nphots2 = self.nphots2
         except AttributeError:
@@ -454,7 +384,6 @@ class Crossspectrum(object):
             frequency bin
         """
 
-<<<<<<< HEAD
         minfreq = self.freq[1] * 0.5  # frequency to start from
         maxfreq = self.freq[-1]  # maximum frequency to end
         binfreq = [minfreq, minfreq + self.df]  # first
@@ -479,50 +408,15 @@ class Crossspectrum(object):
         # compute the number of powers in each frequency bin
         nsamples = np.array([len(binno[np.where(binno == i)[0]])
                              for i in range(np.max(binno))])
-=======
-        binfreq, binpower, binpower_err, nsamples = \
-            rebin_data_log(self.freq, self.power, f,
-                           y_err=self.power_err, dx=self.df)
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         # the frequency resolution
         df = np.diff(binfreq)
 
         # shift the lower bin edges to the middle of the bin and drop the
         # last right bin edge
-<<<<<<< HEAD
         binfreq = binfreq[:-1] + df/2
 
         return binfreq, binpower, binpower_err, nsamples
-=======
-        binfreq = binfreq[:-1] + df / 2
-
-        new_spec = copy.copy(self)
-        new_spec.freq = binfreq
-        new_spec.power = binpower
-        new_spec.power_err = binpower_err
-        new_spec.m = nsamples * self.m
-
-
-        if hasattr(self, 'unnorm_power'):
-            _, binpower_unnorm, _, _ = \
-                rebin_data_log(self.freq, self.unnorm_power, f, dx=self.df)
-
-            new_spec.unnorm_power = binpower_unnorm
-
-        if hasattr(self, 'pds1'):
-            new_spec.pds1 = self.pds1.rebin_log(f)
-        if hasattr(self, 'pds2'):
-            new_spec.pds2 = self.pds2.rebin_log(f)
-
-        if hasattr(self, 'cs_all'):
-            cs_all = []
-            for c in self.cs_all:
-                cs_all.append(c.rebin_log(f))
-            new_spec.cs_all = cs_all
-
-        return new_spec
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def coherence(self):
         """
@@ -542,15 +436,10 @@ class Crossspectrum(object):
         """
         # this computes the averaged power spectrum, but using the
         # cross spectrum code to avoid circular imports
-<<<<<<< HEAD
         ps1 = Crossspectrum(self.lc1, self.lc1)
         ps2 = Crossspectrum(self.lc2, self.lc2)
 
         return self.unnorm_power.real/(ps1.unnorm_power.real * ps2.unnorm_power.real)
-=======
-
-        return self.unnorm_power.real/(self.pds1.power.real * self.pds2.power.real)
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
     def _phase_lag(self):
         """Return the fourier phase lag of the cross spectrum."""
@@ -574,10 +463,7 @@ class AveragedCrossspectrum(Crossspectrum):
 
     def __init__(self, lc1=None, lc2=None, segment_size=None,
                  norm='none', gti=None):
-<<<<<<< HEAD
         print("Modified Avg CS")
-=======
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
         """
         Make an averaged cross spectrum from a light curve by segmenting two
         light curves, Fourier-transforming each segment and then averaging the
@@ -650,16 +536,9 @@ class AveragedCrossspectrum(Crossspectrum):
         """
         self.type = "crossspectrum"
 
-<<<<<<< HEAD
         if segment_size is not None:
             if not np.isfinite(segment_size):
                 raise ValueError("segment_size must be finite")
-=======
-        if segment_size is None and lc1 is not None:
-            raise ValueError("segment_size must be specified")
-        if segment_size is not None and not np.isfinite(segment_size):
-            raise ValueError("segment_size must be finite!")
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         self.segment_size = segment_size
 
@@ -667,19 +546,6 @@ class AveragedCrossspectrum(Crossspectrum):
 
         return
 
-<<<<<<< HEAD
-=======
-    def _make_auxil_pds(self, lc1, lc2):
-        # A way to say that this is actually not a power spectrum
-        if lc1 is not lc2 and isinstance(lc1, Lightcurve):
-            self.pds1 = AveragedCrossspectrum(lc1, lc1,
-                                              segment_size=self.segment_size,
-                                              norm='none', gti=lc1.gti)
-            self.pds2 = AveragedCrossspectrum(lc2, lc2,
-                                              segment_size=self.segment_size,
-                                              norm='none', gti=lc2.gti)
-
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
     def _make_segment_spectrum(self, lc1, lc2, segment_size):
 
         # TODO: need to update this for making cross spectra.
@@ -701,7 +567,6 @@ class AveragedCrossspectrum(Crossspectrum):
             self.gti = cross_two_gtis(lc1.gti, lc2.gti)
 
         check_gtis(self.gti)
-<<<<<<< HEAD
         start_inds, end_inds = \
                 bin_intervals_from_gtis(self.gti, segment_size, lc1.time,
                                     dt=lc1.dt)
@@ -746,38 +611,6 @@ class AveragedCrossspectrum(Crossspectrum):
                          start_inds, end_inds,
                          jit = False, shared_res = True)
 
-=======
-
-        cs_all = []
-        nphots1_all = []
-        nphots2_all = []
-
-        start_inds, end_inds = \
-            bin_intervals_from_gtis(self.gti, segment_size, lc1.time,
-                                    dt=lc1.dt)
-
-        for start_ind, end_ind in zip(start_inds, end_inds):
-            time_1 = lc1.time[start_ind:end_ind]
-            counts_1 = lc1.counts[start_ind:end_ind]
-            counts_1_err = lc1.counts_err[start_ind:end_ind]
-            time_2 = lc2.time[start_ind:end_ind]
-            counts_2 = lc2.counts[start_ind:end_ind]
-            counts_2_err = lc2.counts_err[start_ind:end_ind]
-            lc1_seg = Lightcurve(time_1, counts_1, err=counts_1_err,
-                                 err_dist=lc1.err_dist,
-                                 gti=[[time_1[0] - lc1.dt/2,
-                                       time_1[-1] + lc1.dt / 2]],
-                                 dt=lc1.dt)
-            lc2_seg = Lightcurve(time_2, counts_2, err=counts_2_err,
-                                 err_dist=lc2.err_dist,
-                                 gti=[[time_2[0] - lc2.dt/2,
-                                       time_2[-1] + lc2.dt / 2]],
-                                 dt=lc2.dt)
-            cs_seg = Crossspectrum(lc1_seg, lc2_seg, norm=self.norm)
-            cs_all.append(cs_seg)
-            nphots1_all.append(np.sum(lc1_seg.counts))
-            nphots2_all.append(np.sum(lc2_seg.counts))
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
         return cs_all, nphots1_all, nphots2_all
 
     def _make_crossspectrum(self, lc1, lc2):
@@ -801,10 +634,7 @@ class AveragedCrossspectrum(Crossspectrum):
             self.cs_all, nphots1_all, nphots2_all = [], [], []
             # TODO: should be using izip from iterables if lc1 or lc2 could
             # be long
-<<<<<<< HEAD
             #av
-=======
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
             for lc1_seg, lc2_seg in zip(lc1, lc2):
 
                 if self.type == "crossspectrum":
@@ -874,11 +704,7 @@ class AveragedCrossspectrum(Crossspectrum):
         .. [1] http://iopscience.iop.org/article/10.1086/310430/pdf
 
         """
-<<<<<<< HEAD
         if self.m < 50:
-=======
-        if np.any(self.m < 50):
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
             simon("Number of segments used in averaging is "
                   "significantly low. The result might not follow the "
                   "expected statistical distributions.")
@@ -891,7 +717,6 @@ class AveragedCrossspectrum(Crossspectrum):
         unnorm_power_avg /= self.m
         num = np.absolute(unnorm_power_avg)**2
 
-<<<<<<< HEAD
         # this computes the averaged power spectrum, but using the
         # cross spectrum code to avoid circular imports
         aps1 = AveragedCrossspectrum(self.lc1, self.lc1,
@@ -908,11 +733,6 @@ class AveragedCrossspectrum(Crossspectrum):
         for ps in aps2.cs_all:
             unnorm_powers_avg_2 += ps.unnorm_power.real
         unnorm_powers_avg_2 /= aps2.m
-=======
-        # The normalization was 'none'!
-        unnorm_powers_avg_1 = self.pds1.power.real
-        unnorm_powers_avg_2 = self.pds2.power.real
->>>>>>> cbe87c34664519d992317792703ccec5492528f2
 
         coh = num / (unnorm_powers_avg_1 * unnorm_powers_avg_2)
 
