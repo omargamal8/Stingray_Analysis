@@ -17,4 +17,6 @@ There are two ways to run the tests.
    You then should run the script and specify its arguments (base and power). The script will run a test with using the size of base*10^power.
    For example if we want to tests the lightcurve.\__init__ We would go to the ./Lightcurve/\__init__/ directory.
    Then run `python SingleTest.py 1 4` which would run the test with a Lightcurve of size 1 * 10^4 which is equal to (10,000).
+
+
     
