@@ -34,7 +34,7 @@ def singleTest(base,power):
 		lc2 = Lightcurve(times1, counts2)
 
 		# print("lc actual size:", len(lc1))
-		segment_size = 1000
+		segment_size = 100
 		av_cs = AveragedCrossspectrum(lc1,lc2, segment_size)	
 
 		t0 = time.time()
